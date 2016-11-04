@@ -11,15 +11,19 @@
   </head>
   <body>
 
+  <!-- Header -->
+
     <header class="header">
       <div class="header__inner">
         <img class="header__logo" src="images/city.png" alt="iconic view of a cityscape">
         <h1 class="header__title">
           The Brighton Times
         </h1>
-        <i class="fa fa-bars fa-2x" aria-hidden="true"></i>
+        <i id="nav-button" class="fa fa-bars fa-2x" aria-hidden="true"></i>
       </div>
     </header>
+
+  <!-- Navigation -->
 
     <nav id="drawer" class="nav">
       <ul class="nav__list">
@@ -30,15 +34,18 @@
       </ul>
     </nav>
 
+  <!-- Main Content -->
+
     <main>
       <section class="content">
+    <!-- Hero -->
         <section class="hero">
           <article class="description">
             <h2>Absolutely astonishing breaking news!</h2>
             <p>Organic raw denim Vice keffiyeh lomo Kickstarter art lomo Kickstarter art four loko. Organic raw denim Vice keffiyeh lomo Kickstarter art lomo Kickstarter art four loko.</p>
           </article>
         </section>
-
+    <!--Top News -->
         <section class="news top-news">
           <h2 class="news__title">Top news <a href="#" class="news__more">+ more</a></h2>
           <ul>
@@ -56,7 +63,7 @@
             </li>
           </ul>
         </section>
-
+    <!-- Scores -->
         <section class="scores">
           <table class="scores__table">
             <thead>
@@ -107,7 +114,7 @@
             </tbody>
           </table>
         </section>
-
+    <!-- Weather -->
         <section class="weather">
           <span class="weather__location">Brighton, UK</span>
           <span class="weather__desc">Sunny</span>
@@ -138,7 +145,7 @@
             </li>
           </ul>
         </section>
-
+    <!-- Recent News -->
         <section class="news recent-news">
           <h2 class="news__title">Latest news <a href="#" class="news__more">+ more</a></h2>
           <ul>
@@ -172,6 +179,7 @@
           </ul>
         </section>
       </section>
+<!-- Footer -->
       <footer>
         <ul>
           <li><a href="#">Contact us</a></li>
@@ -181,4 +189,22 @@
       </footer>
     </main>
   </body>
+
+
+  <script>
+  /*
+      * Open the drawer when the menu ison is clicked.
+      */
+     var menu = document.querySelector('#nav-button');
+     var main = document.querySelector('main');
+     var drawer = document.querySelector('#drawer');
+
+     menu.addEventListener('click', function(e) {
+       drawer.classList.toggle('open');
+       e.stopPropagation();
+     });
+     main.addEventListener('click', function() {
+       drawer.classList.remove('open');
+     });
+  </script>
 </html>

@@ -426,4 +426,17 @@ footer a {
   .top-news {
     width: 100%;
   }
+
+  .weather {
+    width: 100%;
+    order: 0;
+  }
+
+  .weather__next {
+    display: none;
+  }
+
+  .scores {
+    order: 1;
+  }
 }
