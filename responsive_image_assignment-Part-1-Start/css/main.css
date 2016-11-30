@@ -13,19 +13,50 @@ I've left some boilerplate below for you.
 */
 
 body {
-
+  margin: auto;
+  font-family: 'Roberto', sans-serif;
 }
 
-article {
-  width: 100%;
-  max-width: 900px
+/*  Header */
+
+header {
+  text-align: center;
 }
 
 h1 {
+  margin: 0;
+}
 
+.script {
+  font-family: 'Petit Formal Script', cursive;
+}
+
+.responsive {
+  font-family: 'Roboto', sans-serif;
+  color: grey;
+  text-transform: uppercase;
+  font-size: 2.5 em;
+  margin-top: -30px;
+  margin-bottom: -30px;
+}
+
+/* Body */
+
+article {
+  width: 100%;
+  max-width: 900px;
+  margin: auto;
 }
 
 img {
   max-width: 100%;
+}
 
+figcaption {
+  font-size: 14px;
+}
+
+hr {
+  width: 900px;
+  float: left;
 }
