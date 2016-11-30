@@ -17,11 +17,18 @@ body {
   font-family: 'Roberto', sans-serif;
 }
 
+p, h2 {
+  margin-left: 40px;
+  margin-right: 40px;
+}
+
 /*  Header */
 
 header {
   text-align: center;
 }
+
+/* Header Logo */
 
 h1 {
   margin: 0;
@@ -35,9 +42,11 @@ h1 {
   font-family: 'Roboto', sans-serif;
   color: grey;
   text-transform: uppercase;
-  font-size: 2.5 em;
+  font-size: 2.5em;
   margin-top: -30px;
   margin-bottom: -30px;
+  position: relative;
+  z-index: -1;
 }
 
 /* Body */
@@ -48,15 +57,35 @@ article {
   margin: auto;
 }
 
+h2 {
+  font-family: 'Petit Formal Script', cursive;
+  font-size: 2em;
+}
+
 img {
   max-width: 100%;
 }
 
 figcaption {
   font-size: 14px;
+  color: grey;
+}
+
+/* Footer */
+
+a {
+  margin: 20px;
+  text-decoration: none;
+  color: grey;
 }
 
 hr {
   width: 900px;
-  float: left;
+  color: grey;
+}
+
+footer {
+  width: 100%;
+  max-width: 900px;
+  margin: auto;
 }
