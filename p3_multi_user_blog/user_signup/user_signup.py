@@ -52,7 +52,11 @@ class MainPage(Handler):
         user_username = valid_username(self.request.get('username'))
         user_password = valid_password(self.request.get('password'))
         user_email = valid_email(self.request.get('email'))
-        self.write("Thanks for signing up!")
+
+        if not (user_username and user_password and user_email):
+            self.write(signup_form)
+        else:
+            self.write("Thanks for signing up!")
 
 app = webapp2.WSGIApplication([
     ('/', MainPage)
