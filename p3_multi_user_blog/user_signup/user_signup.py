@@ -20,25 +20,25 @@ signup_form = """
                     <td class="label">Username</td>
                     <td><input type="text" name="username"
                         value="%(username)s"></td>
-                    <td class="error">%(error)s</td>
+                    <td class="error">%(error_username)s</td>
                 </tr>
                 <tr>
                     <td class="label">Password</td>
                     <td><input type="password" name="password"
                         value="%(password)s"></td>
-                    <td class="error"></td>
+                    <td class="error">%(error_password)s</td>
                 </tr>
                 <tr>
                     <td class="label">Confirm</td>
                     <td><input type="password" name="verify"
                     value="%(verify)s"></td>
-                    <td class="error"></td>
+                    <td class="error">%(error_verify)s</td>
                 </tr>
                 <tr>
                     <td class="label">Email</td>
                     <td><input type="text" name="email"
                     value="%(email)s"></td>
-                    <td class="error"></td>
+                    <td class="error">%(error_email)s</td>
             </tbody>
         </table>
             <br>
@@ -70,22 +70,17 @@ EMAIL_RE = re.compile(r"^[\S]+@[\S]+.[\S]+$")
 
 # validates users username against username regex
 def valid_username(username):
-    return USER_RE.match(username)
+    return username and USER_RE.match(username)
 
 
 # validates users password against password regex
 def valid_password(password):
-    return PASSWORD_RE.match(password)
-
-# validates users password against users verify  TODO - write function
-# def valid_verify(verify):
-#     if user_password == user_verify:
-#         return
+    return password and PASSWORD_RE.match(password)
 
 
 # validates users email address against email regex
 def valid_email(email):
-    return EMAIL_RE.match(email)
+    return email and EMAIL_RE.match(email)
 
 
 def escape_html(string):
@@ -93,35 +88,51 @@ def escape_html(string):
 
 
 class MainPage(Handler):
-    def write_form(self, error="", username="", password="", verify="",
+    def write_form(self, error_username="", username="", error_password="",
+                   password="", error_verify="", verify="", error_email="",
                    email=""):
-        self.write(signup_form % {"error": error,
+        self.write(signup_form % {"error_username": error_username,
                                   "username": escape_html(username),
+                                  "error_password": error_password,
                                   "password": escape_html(password),
+                                  "error_verify": error_verify,
                                   "verify": escape_html(verify),
+                                  "error_email": error_email,
                                   "email": escape_html(email)})
 
     def get(self):
         self.write_form()
 
     def post(self):
-        user_username = self.request.get('username')
-        user_password = self.request.get('password')
-        user_verify = self.request.get('verify')
-        user_email = self.request.get('email')
+        have_error = False
+        username = self.request.get('username')
+        password = self.request.get('password')
+        verify = self.request.get('verify')
+        email = self.request.get('email')
 
-        username = valid_username(user_username)
-        password = valid_password(user_password)
-        verify = user_verify  # TODO write verification for matching passwords
-        email = valid_email(user_email)
+        params = dict(username=username)
 
-        # checks validity of input TODO add password/verify match
-        if not ((password and verify) and (username or email)):
-            self.write_form("That doesn't look valid!", user_username,
-                            user_email)
-            # TODO keep user email upon form rewrite
+        if not valid_username(username):
+            params['error_username'] = "Username is not valid"
+            have_error = True
+
+        if not valid_password(password):
+            params['error_password'] = "Password is not valid"
+            have_error = True
+        elif password != verify:
+            params['error_verify'] = "Password did not match"
+            have_error = True
+
+        if email and not valid_email(email):
+            params['error_email'] = "Email is not valid"
+            have_error = True
+
+        if have_error:
+            print params
+            self.write_form(**params)
         else:
-            self.redirect("/welcome?username=" + user_username)
+            self.redirect("/welcome?username=" + username)
+
 
 
 class WelcomePage(Handler):
