@@ -41,7 +41,10 @@ class MainPage(Handler):
         post = self.request.get("post")
 
         if title and post:
-            self.write("Thanks!")
+            # creates an instance of Post and saves to db
+            p = Post(title=title, post=post)
+            p.put()
+            self.redirect('/')
         else:
             error = "Entry must have a title and a body!"
             self.render_index(title, post, error)
