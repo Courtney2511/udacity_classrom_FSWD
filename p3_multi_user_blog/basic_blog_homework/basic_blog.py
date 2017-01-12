@@ -31,7 +31,8 @@ class Post(db.Model):
 class MainPage(Handler):
 
     def render_index(self, title="", post="", error=""):
-        self.render("index.html", title=title, post=post, error=error)
+        posts = db.GqlQuery("SELECT * from Post ORDER BY created DESC")
+        self.render("index.html", title=title, post=post, error=error, posts=posts)
 
     def get(self):
         self.render_index()
