@@ -31,7 +31,10 @@ class Art(db.Model):
 class MainPage(Handler):
 
     def render_front(self, title="", art="", error=""):
-        self.render("front.html", title=title, art=art, error=error)
+        #  query the database for all art instances
+        arts = db.GqlQuery("SELECT * FROM Art ORDER BY created DESC")
+        self.render("front.html", title=title, art=art, error=error, arts=arts)
+
 
     def get(self):
         self.render_front()
@@ -41,7 +44,10 @@ class MainPage(Handler):
         art = self.request.get("art")
 
         if title and art:
-            self.write("Thanks!")
+            a = Art(title=title, art=art)  # creates an instance of Art from user input
+            a.put()  # stores the instance in GAE Datastore
+
+            self.redirect("/")  # redirects to main page
         else:
             error = "we need both title and art"
             self.render_front(title, art, error)
