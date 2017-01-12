@@ -44,19 +44,6 @@ class NewPost(Handler):
     def get(self):
         self.render("newpost.html")
 
-    def post(self):
-        title = self.request.get("title")
-        post = self.request.get("post")
-
-        if title and post:
-            # creates an instance of Post and saves to db
-            p = Post(title=title, post=post)
-            p.put()
-            self.redirect('/')
-        else:
-            error = "Entry must have a title and a body!"
-            self.render_index(title, post, error)
-
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/newpost', NewPost)
                                ], debug=True)
