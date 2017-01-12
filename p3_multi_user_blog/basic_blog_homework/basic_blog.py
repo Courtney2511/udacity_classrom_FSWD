@@ -32,10 +32,17 @@ class MainPage(Handler):
 
     def render_index(self, title="", post="", error=""):
         posts = db.GqlQuery("SELECT * from Post ORDER BY created DESC")
-        self.render("index.html", title=title, post=post, error=error, posts=posts)
+        self.render("index.html", title=title, post=post, error=error,
+                    posts=posts)
 
     def get(self):
         self.render_index()
+
+
+class NewPost(Handler):
+
+    def get(self):
+        self.render("newpost.html")
 
     def post(self):
         title = self.request.get("title")
@@ -50,4 +57,6 @@ class MainPage(Handler):
             error = "Entry must have a title and a body!"
             self.render_index(title, post, error)
 
-app = webapp2.WSGIApplication([('/', MainPage)], debug=True)
+app = webapp2.WSGIApplication([('/', MainPage),
+                               ('/newpost', NewPost)
+                               ], debug=True)
