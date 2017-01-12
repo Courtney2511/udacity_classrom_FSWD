@@ -22,6 +22,12 @@ class Handler(webapp2.RequestHandler):
         self.write(self.render_str(template, **kw))
 
 
+class Post(db.Model):
+    title = db.StringProperty(required=True)
+    post = db.TextProperty(required=True)
+    created = db.DateTimeProperty(auto_now_add=True)
+
+
 class MainPage(Handler):
 
     def render_index(self, title="", post="", error=""):
