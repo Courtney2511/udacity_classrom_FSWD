@@ -46,7 +46,7 @@
   <div class="content">
   {% for post in posts %}
   <div class="post">
-    <div class="headline">
+    <div class="headline"> {{ post }}
       <h2 class="post-title">{{post.title}}</h2>
       <div class="post-date">{{post.created}}</div>
     </div>

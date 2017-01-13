@@ -55,15 +55,23 @@ class NewPost(Handler):
             # creates an instance of Post and saves to db
             p = Post(title=title, post=post)
             p.put()
-            post_id = str(p.key().id())
-            self.redirect('/' + post_id)
+            post_id = p.key().id()
+            self.redirect('/' + str(post_id))
         else:
             error = "Entry must have a title and a body!"
             self.render_newpost(title, post, error)
 
 class PostPage(Handler):
+
+    def render_article(self, post_id, title="", post=""):
+        article = Post.get_by_id(int(post_id))
+        # article = db.GqlQuery("SELECT * from Post WHERE __key__ = KEY('post_id')")
+
+        self.render('post.html', post=post, title=title, article=article)
+
     def get(self, post_id):
-        self.write("Post Page")
+        self.render_article(post_id)
+
 
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/newpost', NewPost),
