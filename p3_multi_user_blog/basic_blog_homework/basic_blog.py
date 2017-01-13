@@ -25,7 +25,7 @@ class Handler(webapp2.RequestHandler):
 class Post(db.Model):
     title = db.StringProperty(required=True)
     post = db.TextProperty(required=True)
-    created = db.DateTimeProperty(auto_now_add=True)
+    created = db.DateProperty(auto_now_add=True)
 
 
 class MainPage(Handler):
@@ -41,9 +41,31 @@ class MainPage(Handler):
 
 class NewPost(Handler):
 
+    def render_newpost(self, title="", post="", error=""):
+        self.render("newpost.html", title=title, post=post, error=error)
+
     def get(self):
-        self.render("newpost.html")
+        self.render_newpost()
+
+    def post(self):
+        title = self.request.get("subject")
+        post = self.request.get("content")
+
+        if title and post:
+            # creates an instance of Post and saves to db
+            p = Post(title=title, post=post)
+            p.put()
+            post_id = str(p.key().id())
+            self.redirect('/' + post_id)
+        else:
+            error = "Entry must have a title and a body!"
+            self.render_newpost(title, post, error)
+
+class PostPage(Handler):
+    def get(self, post_id):
+        self.write("Post Page")
 
 app = webapp2.WSGIApplication([('/', MainPage),
-                               ('/newpost', NewPost)
+                               ('/newpost', NewPost),
+                               (r'/(\d+)', PostPage)
                                ], debug=True)
