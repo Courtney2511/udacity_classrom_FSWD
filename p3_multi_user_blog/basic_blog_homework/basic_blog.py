@@ -65,8 +65,6 @@ class PostPage(Handler):
 
     def render_article(self, post_id, title="", post=""):
         article = Post.get_by_id(int(post_id))
-        # article = db.GqlQuery("SELECT * from Post WHERE __key__ = KEY('post_id')")
-
         self.render('post.html', post=post, title=title, article=article)
 
     def get(self, post_id):
