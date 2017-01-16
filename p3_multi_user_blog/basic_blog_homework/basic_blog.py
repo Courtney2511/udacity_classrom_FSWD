@@ -22,12 +22,14 @@ class Handler(webapp2.RequestHandler):
         self.write(self.render_str(template, **kw))
 
 
+# Creates Post table
 class Post(db.Model):
     title = db.StringProperty(required=True)
     post = db.TextProperty(required=True)
     created = db.DateProperty(auto_now_add=True)
 
 
+# Main Page Handler
 class MainPage(Handler):
 
     def render_index(self, title="", post="", error=""):
@@ -39,6 +41,7 @@ class MainPage(Handler):
         self.render_index()
 
 
+# New Post Page Handler
 class NewPost(Handler):
 
     def render_newpost(self, title="", post="", error=""):
@@ -61,6 +64,8 @@ class NewPost(Handler):
             error = "Entry must have a title and a body!"
             self.render_newpost(title, post, error)
 
+
+# Post Page Handler
 class PostPage(Handler):
 
     def render_article(self, post_id, title="", post=""):
@@ -70,8 +75,14 @@ class PostPage(Handler):
     def get(self, post_id):
         self.render_article(post_id)
 
+# Sign Up Page Handler
+class SignUp(Handler):
+
+    def get(self):
+        self.render('signup.html')
 
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/newpost', NewPost),
-                               (r'/(\d+)', PostPage)
+                               (r'/(\d+)', PostPage),
+                               ('/signup', SignUp)
                                ], debug=True)

@@ -1,0 +1,38 @@
+    <style>
+        .error {
+            color:red;
+        }
+    </style>
+    <h1>Signup</h1>
+    <br>
+    <form method="post">
+        <table>
+            <tbody>
+                <tr>
+                    <td class="label">Username</td>
+                    <td><input type="text" name="username"
+                        value="%(username)s"></td>
+                    <td class="error">%(error_username)s</td>
+                </tr>
+                <tr>
+                    <td class="label">Password</td>
+                    <td><input type="password" name="password"
+                        value="%(password)s"></td>
+                    <td class="error">%(error_password)s</td>
+                </tr>
+                <tr>
+                    <td class="label">Confirm</td>
+                    <td><input type="password" name="verify"
+                    value="%(verify)s"></td>
+                    <td class="error">%(error_verify)s</td>
+                </tr>
+                <tr>
+                    <td class="label">Email</td>
+                    <td><input type="text" name="email"
+                    value="%(email)s"></td>
+                    <td class="error">%(error_email)s</td>
+            </tbody>
+        </table>
+            <br>
+            <input type="submit" name="submit">
+</form>
