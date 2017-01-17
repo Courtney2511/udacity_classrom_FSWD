@@ -121,13 +121,16 @@ class SignUp(Handler):
 
         if have_error:
             self.render('signup.html', **params)
+        else:
+            self.redirect("/welcome?username=" + username)
 
 
 # Welcome Page Handler
 class WelcomePage(Handler):
 
     def get(self):
-        self.write('Welcome Page')
+        username = self.request.get('username')
+        self.render("welcome.html", username=username)
 
 
 #  SIGN UP PAGE FUNCTIONS
