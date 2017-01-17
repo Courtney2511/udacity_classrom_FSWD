@@ -1,60 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Basic Blog</title>
+ {% extends "base.html" %}
 
-  <style type="text/css">
-    body {
-    position: relative;
-    font-family: Helvetica, Arial, sans-serif;
-    font-size: 14px;
-    width: 800px;
-    margin: 0 auto;
-    padding: 10px;
-    color: #333;
-  }
-
-  .main-title  {
-    display: block;
-    color: #222;
-    font-size: 40px;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 30px;
-    text-decoration: none;
-  }
-
-  .headline {
-    position: relative;
-    border-bottom: 3px solid #666;
-  }
-
-  .body {
-    margin-top: 5px;
-  }
-
-  .error {
-    color: red;
-  }
-
-  </style>
-</head>
-<body>
-  <h1 class="main-title">Basic Blog</h1>
-
-  <div class="content">
-  {% for post in posts %}
-  <div class="post">
-    <div class="headline">
-      <a href="/{{ post.key().id()}}" class="post-title"> {{ post.title }} </a>
-      <div class="post-date">{{post.created}}</div>
+ {% block content %}
+<div class="content">
+    {% for post in posts %}
+    <div class="post">
+        <div class="headline">
+            <a href="/{{ post.key().id()}}" class="post-title"> {{ post.title }} </a>
+            <div class="post-date">{{post.created}}</div>
+        </div>
+        <div class="body">
+            <p class="post-body">{{post.post}}</p>
+        </div>
     </div>
-    <div class="body">
-      <p class="post-body">{{post.post}}</p>
-    </div>
-  </div>
-  {% endfor %}
-  </div>
-</body>
-</html>
+    {% endfor %}
+</div>
+{% endblock %}

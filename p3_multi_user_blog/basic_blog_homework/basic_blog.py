@@ -11,6 +11,24 @@ jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir),
                                autoescape=True)
 
 
+# ---- Database ---- #
+
+# Creates Post table and Post model
+class Post(db.Model):
+    title = db.StringProperty(required=True)
+    post = db.TextProperty(required=True)
+    created = db.DateProperty(auto_now_add=True)
+
+
+# Creates User table and User model
+class User(db.Model):
+    name = db.StringProperty(required=True)
+    pw_hash = db.StringProperty(required=True)
+    email = db.StringProperty()
+
+
+# ---- Handler Classes ---- #
+
 # Basic Handler class
 class Handler(webapp2.RequestHandler):
     def write(self, *a, **kw):
@@ -22,13 +40,6 @@ class Handler(webapp2.RequestHandler):
 
     def render(self, template, **kw):
         self.write(self.render_str(template, **kw))
-
-
-# Creates Post table
-class Post(db.Model):
-    title = db.StringProperty(required=True)
-    post = db.TextProperty(required=True)
-    created = db.DateProperty(auto_now_add=True)
 
 
 # Main Page Handler
@@ -77,6 +88,7 @@ class PostPage(Handler):
     def get(self, post_id):
         self.render_article(post_id)
 
+
 # Sign Up Page Handler
 class SignUp(Handler):
 
@@ -92,7 +104,7 @@ class SignUp(Handler):
 
         params = dict(username=username, email=email)
 
-        if not valid_password(username):
+        if not valid_username(username):
             params['error_username'] = "Username is not valid"
             have_error = True
 
@@ -111,8 +123,14 @@ class SignUp(Handler):
             self.render('signup.html', **params)
 
 
+# Welcome Page Handler
+class WelcomePage(Handler):
 
-# SIGN UP PAGE FUNCTIONS
+    def get(self):
+        self.write('Welcome Page')
+
+
+#  SIGN UP PAGE FUNCTIONS
 
 # regex constant for username validation
 USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
@@ -140,10 +158,32 @@ def valid_email(email):
 def escape_html(string):
     return cgi.escape(string, quote=True)
 
+
+# USER FUNCTIONS
+
+# makes a random 5 letter salt
+def make_salt():
+    return ''.join(random.choice(string.letters) for x in xrange(5))
+
+
+# creates a password hash and salt if not already generated
+def make_pw_hash(name, pw, salt=None):
+    if not salt:
+        salt = make_salt()
+    h = hashlib.sha256(name + pw + salt).hexdigest()
+    return '%s|%s' % (h, salt)
+
+
+# tests if password is valid
+def valid_pw(name, pw, h):
+    salt = h.split('|')[1]
+    return h == make_pw_hash(name, pw, salt)
+
 # Page Mapping
 
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/newpost', NewPost),
                                (r'/(\d+)', PostPage),
-                               ('/signup', SignUp)
+                               ('/signup', SignUp),
+                               ('/welcome', WelcomePage)
                                ], debug=True)
