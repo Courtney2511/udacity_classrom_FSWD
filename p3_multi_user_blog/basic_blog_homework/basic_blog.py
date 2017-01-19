@@ -3,6 +3,10 @@ import cgi
 import re
 import webapp2
 import jinja2
+import hashlib
+import hmac
+import random
+import string
 
 from google.appengine.ext import db
 
@@ -10,6 +14,7 @@ template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir),
                                autoescape=True)
 
+SECRET = "kickass"
 
 # ---- Database ---- #
 
@@ -91,6 +96,17 @@ class PostPage(Handler):
 
 # Sign Up Page Handler
 class SignUp(Handler):
+    def register(self, username, password, email):
+        pw_hash = make_pw_hash(username, password)
+        u = User(name=username, pw_hash=pw_hash, email=email)
+        u.put()
+        cookie_val = make_secure_val(str(u.name))  # if this is not a string, there will be errors
+        self.set_secure_cookie(cookie_val)
+        print("User is: " + u.name + "cookie value is " + cookie_val)
+
+    def set_secure_cookie(self, cookie_val):
+        self.response.headers['Content-Type'] = 'text/plain'
+        self.response.headers.add_header('Set-Cookie', cookie_val)
 
     def get(self):
         self.render('signup.html')
@@ -122,14 +138,17 @@ class SignUp(Handler):
         if have_error:
             self.render('signup.html', **params)
         else:
-            self.redirect("/welcome?username=" + username)
+            self.register(username, password, email)
+            self.redirect('/welcome') # TODO redirect and send user??????
 
 
 # Welcome Page Handler
 class WelcomePage(Handler):
 
-    def get(self):
-        username = self.request.get('username')
+    def get(self, username=""):
+        cookie = self.request.headers.get("Cookie")
+        username = cookie.split('|')[0]
+        print("USERNAME: " + username)
         self.render("welcome.html", username=username)
 
 
@@ -181,6 +200,13 @@ def make_pw_hash(name, pw, salt=None):
 def valid_pw(name, pw, h):
     salt = h.split('|')[1]
     return h == make_pw_hash(name, pw, salt)
+
+def hash_str(string):
+    return hmac.new(SECRET, string).hexdigest()
+
+
+def make_secure_val(string):
+    return "%s|%s" % (string, hash_str(string))
 
 # Page Mapping
 
