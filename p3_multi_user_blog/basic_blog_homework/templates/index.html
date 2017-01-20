@@ -6,11 +6,11 @@
     <div class="post">
         <div class="headline">
             <a href="/{{ post.key().id()}}" class="post-title"> {{ post.title }} </a>
-            <div class="post-date">{{post.created}}</div>
         </div>
         <div class="body">
             <p class="post-body">{{post.post}}</p>
         </div>
+        <div class="created-by">{{post.created}}</div>
     </div>
     {% endfor %}
 </div>

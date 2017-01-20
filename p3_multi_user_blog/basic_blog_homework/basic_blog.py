@@ -16,16 +16,17 @@ jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir),
 
 SECRET = "kickass"
 
-# ---- Database ---- #
+# ---- Entity Models ---- #
 
-# Creates Post table and Post model
+
+# Post Model
 class Post(db.Model):
     title = db.StringProperty(required=True)
     post = db.TextProperty(required=True)
     created = db.DateProperty(auto_now_add=True)
 
 
-# Creates User table and User model
+# User Model
 class User(db.Model):
     name = db.StringProperty(required=True)
     pw_hash = db.StringProperty(required=True)
@@ -50,10 +51,9 @@ class Handler(webapp2.RequestHandler):
 # Main Page Handler
 class MainPage(Handler):
 
-    def render_index(self, title="", post="", error=""):
+    def render_index(self):
         posts = db.GqlQuery("SELECT * from Post ORDER BY created DESC")
-        self.render("index.html", title=title, post=post, error=error,
-                    posts=posts)
+        self.render("index.html", posts=posts)
 
     def get(self):
         self.render_index()
@@ -62,21 +62,25 @@ class MainPage(Handler):
 # New Post Page Handler
 class NewPost(Handler):
 
+    # renders the newpost template
     def render_newpost(self, title="", post="", error=""):
         self.render("newpost.html", title=title, post=post, error=error)
 
+    # gets newpost page
     def get(self):
         self.render_newpost()
 
+    # posts from newpost form
     def post(self):
         title = self.request.get("subject")
         post = self.request.get("content")
 
         if title and post:
-            # creates an instance of Post and saves to db
+            # creates a Post entity and saves to db
             p = Post(title=title, post=post)
             p.put()
             post_id = p.key().id()
+            # redirects to post page
             self.redirect('/' + str(post_id))
         else:
             error = "Entry must have a title and a body!"
@@ -86,27 +90,31 @@ class NewPost(Handler):
 # Post Page Handler
 class PostPage(Handler):
 
-    def render_article(self, post_id, title="", post=""):
+    # renders the article template
+    def render_article(self, post_id):
         article = Post.get_by_id(int(post_id))
-        self.render('post.html', post=post, title=title, article=article)
+        self.render('post.html', article=article)
 
+    # gets post page
     def get(self, post_id):
         self.render_article(post_id)
 
 
 # Sign Up Page Handler
 class SignUp(Handler):
+
+    # creates a User entity and saves to db
     def register(self, username, password, email):
+        # hashes password
         pw_hash = make_pw_hash(username, password)
         u = User(name=username, pw_hash=pw_hash, email=email)
         u.put()
-        cookie_val = make_secure_val(str(u.name))  # if this is not a string, there will be errors
-        self.set_secure_cookie(cookie_val)
-        print("User is: " + u.name + "cookie value is " + cookie_val)
+        # creates and sets name cookie
+        cookie_val = make_secure_val(u.name)
+        self.set_secure_cookie('username', cookie_val)
 
-    def set_secure_cookie(self, cookie_val):
-        self.response.headers['Content-Type'] = 'text/plain'
-        self.response.headers.add_header('Set-Cookie', cookie_val)
+    def set_secure_cookie(self, cookie_name, cookie_val):
+        self.response.set_cookie(cookie_name, cookie_val)
 
     def get(self):
         self.render('signup.html')
@@ -137,20 +145,25 @@ class SignUp(Handler):
 
         if have_error:
             self.render('signup.html', **params)
+
         else:
             self.register(username, password, email)
-            self.redirect('/welcome') # TODO redirect and send user??????
+            self.redirect('/welcome')  # TODO redirect and send user??????
 
 
 # Welcome Page Handler
 class WelcomePage(Handler):
 
     def get(self, username=""):
-        cookie = self.request.headers.get("Cookie")
-        username = cookie.split('|')[0]
-        print("USERNAME: " + username)
-        self.render("welcome.html", username=username)
+        cookie = self.request.cookies.get("username")
 
+        if cookie:
+            username = check_secure_val(cookie)
+
+        if username:
+            self.render("welcome.html", username=username)
+        else:
+            self.redirect("/signup")
 
 #  SIGN UP PAGE FUNCTIONS
 
@@ -201,12 +214,19 @@ def valid_pw(name, pw, h):
     salt = h.split('|')[1]
     return h == make_pw_hash(name, pw, salt)
 
+
 def hash_str(string):
     return hmac.new(SECRET, string).hexdigest()
 
 
-def make_secure_val(string):
-    return "%s|%s" % (string, hash_str(string))
+def make_secure_val(val):
+    return "%s|%s" % (val, hash_str(val))
+
+
+def check_secure_val(secure_val):
+    val = secure_val.split("|")[0]
+    if secure_val == make_secure_val(val):
+        return val
 
 # Page Mapping
 
