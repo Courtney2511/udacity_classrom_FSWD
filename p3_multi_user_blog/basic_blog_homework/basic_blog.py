@@ -50,6 +50,9 @@ class Handler(webapp2.RequestHandler):
     def set_secure_cookie(self, cookie_name, cookie_val):
         self.response.set_cookie(cookie_name, cookie_val)
 
+    def logout(self):
+        self.response.headers.add_header('Set-Cookie', 'username=; Path=/')
+
 
 # Main Page Handler
 class MainPage(Handler):
@@ -196,6 +199,12 @@ class LoginPage(Handler):
             self.set_secure_cookie('username', cookie_val)
             self.redirect('/welcome')
 
+class LogOut(Handler):
+
+    def get(self):
+        self.logout()
+        self.redirect('/signup')
+
 
 class UsersPage(Handler):
     def get(self):
@@ -279,5 +288,6 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ('/signup', SignUp),
                                ('/welcome', WelcomePage),
                                ('/login', LoginPage),
+                               ('/logout', LogOut),
                                ('/users', UsersPage)
                                ], debug=True)
