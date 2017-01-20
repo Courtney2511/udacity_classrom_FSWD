@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Users and Hashes</h2>
+<div class="content">
+   {% for user in users %}
+   <div class="user">
+    <p>{{user.name}}, {{user.pw_hash}}</p>
+   </div>
+   {% endfor %}
+</div>
+{% endblock %}

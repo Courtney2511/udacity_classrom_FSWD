@@ -47,6 +47,9 @@ class Handler(webapp2.RequestHandler):
     def render(self, template, **kw):
         self.write(self.render_str(template, **kw))
 
+    def set_secure_cookie(self, cookie_name, cookie_val):
+        self.response.set_cookie(cookie_name, cookie_val)
+
 
 # Main Page Handler
 class MainPage(Handler):
@@ -113,9 +116,6 @@ class SignUp(Handler):
         cookie_val = make_secure_val(u.name)
         self.set_secure_cookie('username', cookie_val)
 
-    def set_secure_cookie(self, cookie_name, cookie_val):
-        self.response.set_cookie(cookie_name, cookie_val)
-
     def get(self):
         self.render('signup.html')
 
@@ -168,8 +168,39 @@ class WelcomePage(Handler):
 
 class LoginPage(Handler):
 
+    def valid_login(self, username, password):
+        user = user_by_name(username)
+
+        if user and valid_pw(username, password, user.pw_hash):
+            return user
+
+    def render_login(self, error=""):
+        self.render('login.html', error=error)
+
     def get(self):
-        self.render('login.html')
+        self.render_login()
+
+    def post(self):
+        have_error = False
+        username = self.request.get('username')
+        password = self.request.get('password')
+
+        user = self.valid_login(username, password)
+
+        if user is None:
+            error = "Invalid Login"
+            self.render_login(error)
+
+        if user:
+            cookie_val = make_secure_val(username)
+            self.set_secure_cookie('username', cookie_val)
+            self.redirect('/welcome')
+
+
+class UsersPage(Handler):
+    def get(self):
+        users = db.GqlQuery("SELECT * from User")
+        self.render('users.html', users=users)
 
 #  SIGN UP PAGE FUNCTIONS
 
@@ -201,6 +232,12 @@ def escape_html(string):
 
 
 # USER FUNCTIONS
+
+# gets user by name
+def user_by_name(username):
+    user = User.all().filter('name =', username).get()
+    return user
+
 
 # makes a random 5 letter salt
 def make_salt():
@@ -234,12 +271,13 @@ def check_secure_val(secure_val):
     if secure_val == make_secure_val(val):
         return val
 
-# Page Mapping
+# Routing
 
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/newpost', NewPost),
                                (r'/(\d+)', PostPage),
                                ('/signup', SignUp),
                                ('/welcome', WelcomePage),
-                               ('/login', LoginPage)
+                               ('/login', LoginPage),
+                               ('/users', UsersPage)
                                ], debug=True)
