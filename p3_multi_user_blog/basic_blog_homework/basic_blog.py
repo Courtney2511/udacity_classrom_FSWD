@@ -165,6 +165,12 @@ class WelcomePage(Handler):
         else:
             self.redirect("/signup")
 
+
+class LoginPage(Handler):
+
+    def get(self):
+        self.render('login.html')
+
 #  SIGN UP PAGE FUNCTIONS
 
 # regex constant for username validation
@@ -234,5 +240,6 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ('/newpost', NewPost),
                                (r'/(\d+)', PostPage),
                                ('/signup', SignUp),
-                               ('/welcome', WelcomePage)
+                               ('/welcome', WelcomePage),
+                               ('/login', LoginPage)
                                ], debug=True)
