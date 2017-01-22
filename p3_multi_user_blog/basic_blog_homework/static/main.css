@@ -10,6 +10,17 @@ body {
   color: #333;
 }
 
+a {
+  text-decoration: none;
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* --- Header --- */
+
 .main-title {
   display: block;
   color: #222;
@@ -20,13 +31,29 @@ body {
   text-decoration: none;
 }
 
+.nav-bar {
+  display: inline-block;
+  float: right;
+}
+
+.nav-item {
+  float: right;
+  border-radius: 5px;
+  border: 1px solid black;
+  margin: 5px;
+  padding: 5px;
+}
+
+/* --- Index Page --- */
+
 .headline {
   position: relative;
   border-bottom: 3px solid #666;
 }
 
 .body {
-  margin-top: 5px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .error {
