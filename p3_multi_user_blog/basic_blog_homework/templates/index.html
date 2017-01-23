@@ -1,9 +1,9 @@
  {% extends "base.html" %}
 
  {% block content %}
-<div class="content">
+
     {% for post in posts %}
-    <div class="post">
+    <div class="post-box">
         <div class="headline">
             <a href="/{{ post.key().id()}}" class="post-title"> {{ post.title }} </a>
         </div>
@@ -11,7 +11,8 @@
             <p class="post-body">{{post.post}}</p>
         </div>
         <div class="created-by">
-          <p class="authoured">{{post.created.strftime("%b %d, %Y")}} by: {{post.user.name}}</p>
+          <p class="authour">{{post.user.name}}</p>
+          <p class="date">{{post.created.strftime("%b %d, %Y")}}</p>
         </div>
         <!-- {% if post.user.name == username %} {# this is not working #} -->
         <!-- <div class="edit">
@@ -20,5 +21,4 @@
         {% endif %} -->
     </div>
     {% endfor %}
-</div>
 {% endblock %}

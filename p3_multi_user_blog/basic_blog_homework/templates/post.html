@@ -2,32 +2,33 @@
 
 {% block content %}
 
-<div class="headline">
-  <h3 class="post-title">{{ article.title }}</h3>
+<div class="post-box">
+    <div class="headline">
+        <h3 class="post-title">{{ article.title }}</h3>
+    </div>
+    <p class="body">{{ article.post }}</p>
+    <div class="created-by">
+        <p class="authour">{{article.user.name}}</p>
+        <p class="date">{{article.created.strftime("%b %d, %Y")}}</p>
+    </div>
+</div>
+<div class="comment-row row">
+<form method="post">
+    <label>
+      <textarea class="comment-form" name="comment" cols="80" rows="5" placeholder="Add your thoughts....."></textarea>
+    </label>
+    <br>
+    <input type="submit">
 </div>
 
-<p class="body">{{ article.post }}</p>
-
-<form method="post">
-  <label>
-    <div>Add Your Comment!</div>
-    <textarea class="comment-box" name="comment" cols="70" rows="5" placeholder="Add your thoughts....."></textarea>
-  </label>
-  <br>
-  <input type="submit">
-
-
-
-  <div class="comments">
-    {% for comment in article.post_comments%}
-      <div class="comment">
-        <p>{{comment.comment}}</p>
-      </div>
-      <div class="comment-footer">
-        <p>{{comment.created.strftime("%b %d, %Y")}} by: {{comment.user.name}}</p>
-      </div>
-    {% endfor %}
-  </div>
 </form>
-
+{% for comment in article.post_comments%}
+<div class="comment-box">
+    <div class="comment">
+        <p class="authour">{{comment.user.name}}</p>
+        <p class="date">{{comment.created.strftime("%b %d, %Y")}} by: </p>
+        <p class="body">{{comment.comment}}</p>
+    </div>
+</div>
+{% endfor %}
 {% endblock %}

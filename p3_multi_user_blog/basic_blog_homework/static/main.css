@@ -8,10 +8,15 @@ body {
   margin: 0 auto;
   padding: 10px;
   color: #333;
+  background-color: #e9e7e9;
 }
 
 a {
   text-decoration: none;
+}
+
+a:visited {
+  color: inherit;
 }
 
 .page-title {
@@ -21,14 +26,23 @@ a {
 
 /* --- Header --- */
 
+.header {
+  border-bottom: 1px solid grey;
+  margin-bottom: 50px;
+  background-color: white;
+}
+
 .main-title {
   display: block;
   color: #222;
-  font-size: 40px;
-  font-weight: bold;
-  text-align: center;
+  font-size: 25px;
+  padding-top: 10px;
   margin-bottom: 30px;
   text-decoration: none;
+}
+
+.main-title.a:visited {
+  color: grey;
 }
 
 .nav-bar {
@@ -44,7 +58,16 @@ a {
   padding: 5px;
 }
 
+/* --- Base Layout --- */
+
 /* --- Index Page --- */
+
+.post-box {
+  background-color: white;
+  margin: 15px;
+  padding: 20px;
+  border-radius: 3px;
+}
 
 .headline {
   position: relative;
@@ -71,27 +94,37 @@ a {
   text-decoration: none;
 }
 
-.authoured {
-  color: grey;
+.authour {
+  color: #f384d9;
+  margin-left: 10px;
+}
+
+.date {
+  color: #d4cdd2;
+  margin-left: 10px;
 }
 
 /* --- Post Page --- */
 
-.comment-box {
+.comment-row {
+  width: 500px;
+  margin: 0 auto;
+}
+
+.comment-form {
   border-radius: 2px;
-  border-color: grey;
+  border-color: white;
   resize: none;
+}
+
+.comment-box {
+  background-color: white;
+  width: 500px;
+  margin: 0 auto;
+  padding: 10px;
+  margin-bottom: 10px;
 }
 
 .comments {
   margin-left: 30px;
-}
-
-.comment {
-  margin-top: 15px;
-}
-
-.comment-footer {
-  color: grey;
-  font-size: 10px;
 }
