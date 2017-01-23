@@ -2,8 +2,10 @@
 
 {% block content %}
 
-<h2>{{ article.title }} </h2>
+<div class="headline">
+  <h3 class="post-title">{{ article.title }}</h3>
+</div>
 
-<p>{{ article.post }}</p>
+<p class="body">{{ article.post }}</p>
 
 {% endblock %}

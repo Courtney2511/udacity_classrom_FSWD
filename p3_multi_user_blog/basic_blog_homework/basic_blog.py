@@ -18,6 +18,7 @@ SECRET = "kickass"
 
 # ---- Entity Models ---- #
 
+
 # User Model
 class User(db.Model):
     name = db.StringProperty(required=True)
@@ -84,7 +85,6 @@ class NewPost(Handler):
         if username:
             self.render_newpost(username=username)
 
-
     # posts from newpost form
     def post(self, username=""):
         title = self.request.get("subject")
@@ -93,7 +93,6 @@ class NewPost(Handler):
 
         username = check_secure_val(cookie)
         user = user_by_name(username)
-        print(user)
 
         if title and post and username:
             # creates a Post entity and saves to db
@@ -217,6 +216,7 @@ class LoginPage(Handler):
             cookie_val = make_secure_val(username)
             self.set_secure_cookie('username', cookie_val)
             self.redirect('/welcome')
+
 
 class LogOut(Handler):
 
