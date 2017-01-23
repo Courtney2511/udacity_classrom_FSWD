@@ -18,19 +18,19 @@ SECRET = "kickass"
 
 # ---- Entity Models ---- #
 
+# User Model
+class User(db.Model):
+    name = db.StringProperty(required=True)
+    pw_hash = db.StringProperty(required=True)
+    email = db.StringProperty()
+
 
 # Post Model
 class Post(db.Model):
     title = db.StringProperty(required=True)
     post = db.TextProperty(required=True)
     created = db.DateProperty(auto_now_add=True)
-
-
-# User Model
-class User(db.Model):
-    name = db.StringProperty(required=True)
-    pw_hash = db.StringProperty(required=True)
-    email = db.StringProperty()
+    user = db.ReferenceProperty(User, collection_name='user_posts')
 
 
 # ---- Handler Classes ---- #
@@ -69,21 +69,35 @@ class MainPage(Handler):
 class NewPost(Handler):
 
     # renders the newpost template
-    def render_newpost(self, title="", post="", error=""):
+    def render_newpost(self, title="", post="", error="", username=""):
         self.render("newpost.html", title=title, post=post, error=error)
 
     # gets newpost page
-    def get(self):
-        self.render_newpost()
+    def get(self, username=""):
+        cookie = self.request.cookies.get("username")
+
+        if cookie:
+            username = check_secure_val(cookie)
+        else:
+            self.redirect("/login")
+
+        if username:
+            self.render_newpost(username=username)
+
 
     # posts from newpost form
-    def post(self):
+    def post(self, username=""):
         title = self.request.get("subject")
         post = self.request.get("content")
+        cookie = self.request.cookies.get("username")
 
-        if title and post:
+        username = check_secure_val(cookie)
+        user = user_by_name(username)
+        print(user)
+
+        if title and post and username:
             # creates a Post entity and saves to db
-            p = Post(title=title, post=post)
+            p = Post(user=user, title=title, post=post)
             p.put()
             post_id = p.key().id()
             # redirects to post page
@@ -133,6 +147,11 @@ class SignUp(Handler):
 
         if not valid_username(username):
             params['error_username'] = "Username is not valid"
+            have_error = True
+
+        # checks to make sure name is not taken
+        if user_by_name(username) is not None:
+            params['error_username'] = "Username is already taken"
             have_error = True
 
         if not valid_password(password):

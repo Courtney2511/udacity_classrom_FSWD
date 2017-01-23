@@ -10,7 +10,9 @@
         <div class="body">
             <p class="post-body">{{post.post}}</p>
         </div>
-        <div class="created-by">{{post.created}}</div>
+        <div class="created-by">
+          <p class="authoured">{{post.created.strftime("%b %d, %Y")}} by: {{post.user.name}}</p>
+        </div>
     </div>
     {% endfor %}
 </div>
