@@ -12,8 +12,12 @@
         </div>
         <div class="created-by">
           <p class="authoured">{{post.created.strftime("%b %d, %Y")}} by: {{post.user.name}}</p>
-          
         </div>
+        <!-- {% if post.user.name == username %} {# this is not working #} -->
+        <!-- <div class="edit">
+          <a href="#">Edit</a><a href="#">Delete</a>
+        </div>
+        {% endif %} -->
     </div>
     {% endfor %}
 </div>

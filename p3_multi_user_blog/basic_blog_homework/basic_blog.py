@@ -60,6 +60,10 @@ class MainPage(Handler):
 
     def render_index(self):
         posts = db.GqlQuery("SELECT * from Post ORDER BY created DESC")
+        cookie = self.request.cookies.get('username')
+        username = check_secure_val(cookie)  # TODO sort out the user to get edit and delete working
+        user = user_by_name(username)
+        print(user)
         self.render("index.html", posts=posts)
 
     def get(self):
@@ -285,11 +289,11 @@ def valid_pw(name, pw, h):
     salt = h.split('|')[1]
     return h == make_pw_hash(name, pw, salt)
 
-
+# returns the hash value of a string
 def hash_str(string):
     return hmac.new(SECRET, string).hexdigest()
 
-
+# returns a secure value for cookies
 def make_secure_val(val):
     return "%s|%s" % (val, hash_str(val))
 
@@ -308,5 +312,5 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ('/welcome', WelcomePage),
                                ('/login', LoginPage),
                                ('/logout', LogOut),
-                               ('/users', UsersPage)
+                               ('/user', UsersPage)
                                ], debug=True)
