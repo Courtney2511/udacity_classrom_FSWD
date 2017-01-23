@@ -74,3 +74,24 @@ a {
 .authoured {
   color: grey;
 }
+
+/* --- Post Page --- */
+
+.comment-box {
+  border-radius: 2px;
+  border-color: grey;
+  resize: none;
+}
+
+.comments {
+  margin-left: 30px;
+}
+
+.comment {
+  margin-top: 15px;
+}
+
+.comment-footer {
+  color: grey;
+  font-size: 10px;
+}

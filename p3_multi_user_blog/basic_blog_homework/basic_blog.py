@@ -34,7 +34,15 @@ class Post(db.Model):
     user = db.ReferenceProperty(User, collection_name='user_posts')
 
 
+# Comment Model
+class Comment(db.Model):
+    comment = db.TextProperty(required=True)
+    created = db.DateProperty(auto_now_add=True)
+    user = db.ReferenceProperty(User, collection_name='user_comments')
+    post = db.ReferenceProperty(Post, collection_name='post_comments')
+
 # ---- Handler Classes ---- #
+
 
 # Basic Handler class
 class Handler(webapp2.RequestHandler):
@@ -61,7 +69,8 @@ class MainPage(Handler):
     def render_index(self):
         posts = db.GqlQuery("SELECT * from Post ORDER BY created DESC")
         cookie = self.request.cookies.get('username')
-        username = check_secure_val(cookie)  # TODO sort out the user to get edit and delete working
+        username = check_secure_val(cookie)
+        # TODO sort out the user to get edit and delete working
         user = user_by_name(username)
         print(user)
         self.render("index.html", posts=posts)
@@ -121,6 +130,18 @@ class PostPage(Handler):
     # gets post page
     def get(self, post_id):
         self.render_article(post_id)
+
+    def post(self, post_id):
+        article = Post.get_by_id(int(post_id))
+        comment = self.request.get("comment")
+        if comment:
+            cookie = self.request.cookies.get("username")
+            if cookie:
+                username = check_secure_val(cookie)
+                user = user_by_name(username)
+                c = Comment(comment=comment, post=article, user=user)
+                c.put()
+                self.render('post.html', article=article)
 
 
 # Sign Up Page Handler
@@ -289,9 +310,11 @@ def valid_pw(name, pw, h):
     salt = h.split('|')[1]
     return h == make_pw_hash(name, pw, salt)
 
+
 # returns the hash value of a string
 def hash_str(string):
     return hmac.new(SECRET, string).hexdigest()
+
 
 # returns a secure value for cookies
 def make_secure_val(val):
@@ -302,6 +325,12 @@ def check_secure_val(secure_val):
     val = secure_val.split("|")[0]
     if secure_val == make_secure_val(val):
         return val
+
+
+# POST FUNCTIONS
+def post_by_id(post_id):
+    post = Post.get_by_id(int(post_id))
+
 
 # Routing
 

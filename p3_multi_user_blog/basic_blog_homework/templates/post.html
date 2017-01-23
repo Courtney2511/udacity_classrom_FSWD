@@ -11,10 +11,23 @@
 <form method="post">
   <label>
     <div>Add Your Comment!</div>
-    <textarea name="comment" cols="30" rows="10"></textarea>
+    <textarea class="comment-box" name="comment" cols="70" rows="5" placeholder="Add your thoughts....."></textarea>
   </label>
+  <br>
   <input type="submit">
 
+
+
+  <div class="comments">
+    {% for comment in article.post_comments%}
+      <div class="comment">
+        <p>{{comment.comment}}</p>
+      </div>
+      <div class="comment-footer">
+        <p>{{comment.created.strftime("%b %d, %Y")}} by: {{comment.user.name}}</p>
+      </div>
+    {% endfor %}
+  </div>
 </form>
 
 {% endblock %}
