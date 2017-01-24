@@ -1,17 +1,17 @@
 import os
 import cgi
 import re
+import string
+import random
+import hmac
+import hashlib
 import webapp2
 import jinja2
-import hashlib
-import hmac
-import random
-import string
 
 from google.appengine.ext import db
 
-template_dir = os.path.join(os.path.dirname(__file__), 'templates')
-jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir),
+TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), 'templates')
+JINJA_ENV = jinja2.Environment(loader=jinja2.FileSystemLoader(TEMPLATE_DIR),
                                autoescape=True)
 
 SECRET = "kickass"
@@ -19,15 +19,15 @@ SECRET = "kickass"
 # ---- Entity Models ---- #
 
 
-# User Model
 class User(db.Model):
+    """ User Model """
     name = db.StringProperty(required=True)
     pw_hash = db.StringProperty(required=True)
     email = db.StringProperty()
 
 
-# Post Model
 class Post(db.Model):
+    """ Post Model """
     title = db.StringProperty(required=True)
     post = db.TextProperty(required=True)
     created = db.DateProperty(auto_now_add=True)
@@ -35,8 +35,8 @@ class Post(db.Model):
     likes = db.IntegerProperty()
 
 
-# Comment Model
 class Comment(db.Model):
+    """ Comment Model """
     comment = db.TextProperty(required=True)
     created = db.DateProperty(auto_now_add=True)
     user = db.ReferenceProperty(User, collection_name='user_comments')
@@ -45,50 +45,64 @@ class Comment(db.Model):
 # ---- Handler Classes ---- #
 
 
-# Basic Handler class
 class Handler(webapp2.RequestHandler):
+    """ Basic Handler Class """
+
     def write(self, *a, **kw):
+        """ writes response """
         self.response.out.write(*a, **kw)
 
     def render_str(self, template, **params):
-        t = jinja_env.get_template(template)
-        return t.render(params)
+        """ renders jinja template string """
+        jinja_template = JINJA_ENV.get_template(template)
+        return jinja_template.render(params)
 
     def render(self, template, **kw):
+        """ renders jinja template """
         self.write(self.render_str(template, **kw))
 
     def set_secure_cookie(self, cookie_name, cookie_val):
+        """ sets secure cookie"""
         self.response.set_cookie(cookie_name, cookie_val)
 
     def logout(self):
+        """ deletes user from username cookie"""
         self.response.headers.add_header('Set-Cookie', 'username=; Path=/')
 
+    def is_logged_in(self):
+        """ checks for a logged in user """
+        cookie = self.request.cookies.get("username")
+        if cookie.name is not None:
+            return cookie.name
 
-# Main Page Handler
+
 class MainPage(Handler):
+    """ Handles requests to MainPage """
 
     def render_index(self):
+        """ renders index template """
         posts = db.GqlQuery("SELECT * from Post ORDER BY created DESC")
         cookie = self.request.cookies.get('username')
         username = check_secure_val(cookie)
         # TODO sort out the user to get edit and delete working
         user = user_by_name(username)
-        print(user)
+        print user
         self.render("index.html", posts=posts)
 
     def get(self):
+        """ handles get requests """
         self.render_index()
 
 
-# New Post Page Handler
 class NewPost(Handler):
+    """ Handles NewPost requests """
 
-    # renders the newpost template
     def render_newpost(self, title="", post="", error="", username=""):
+        """ renders the newpost template """
         self.render("newpost.html", title=title, post=post, error=error)
 
-    # gets newpost page
     def get(self, username=""):
+        """ handles get requests """
         cookie = self.request.cookies.get("username")
 
         if cookie:
@@ -99,8 +113,8 @@ class NewPost(Handler):
         if username:
             self.render_newpost(username=username)
 
-    # posts from newpost form
     def post(self, username=""):
+        """ handles post requests from newpost form """
         title = self.request.get("subject")
         post = self.request.get("content")
         cookie = self.request.cookies.get("username")
@@ -122,18 +136,20 @@ class NewPost(Handler):
 
 # Post Page Handler
 class PostPage(Handler):
+    """ handles requests to PostPage """
 
-    # renders the article template
     def render_article(self, post_id):
-        article = Post.get_by_id(int(post_id))
+        """ renders the article template """
+        article = Post.get_by_id(int(post_id))   # pylint: disable=no-member
         self.render('post.html', article=article)
 
-    # gets post page
     def get(self, post_id):
+        """ handles get request """
         self.render_article(post_id)
 
     def post(self, post_id):
-        article = Post.get_by_id(int(post_id))
+        """ handles post request from comment form """
+        article = Post.get_by_id(int(post_id))  # pylint: disable=no-member
         comment = self.request.get("comment")
         if comment:
             cookie = self.request.cookies.get("username")
@@ -147,9 +163,10 @@ class PostPage(Handler):
 
 # Sign Up Page Handler
 class SignUp(Handler):
+    """ request handling for signup page """
 
-    # creates a User entity and saves to db
     def register(self, username, password, email):
+        """ creates a User and saves to db """
         # hashes password
         pw_hash = make_pw_hash(username, password)
         u = User(name=username, pw_hash=pw_hash, email=email)
@@ -159,9 +176,11 @@ class SignUp(Handler):
         self.set_secure_cookie('username', cookie_val)
 
     def get(self):
+        """ handles get request """
         self.render('signup.html')
 
     def post(self):
+        """ handles post request """
         have_error = False
         username = self.request.get('username')
         password = self.request.get('password')
@@ -198,10 +217,11 @@ class SignUp(Handler):
             self.redirect('/welcome')  # TODO redirect and send user??????
 
 
-# Welcome Page Handler
 class WelcomePage(Handler):
+    """ Handles requests to the Welcome Page """
 
     def get(self, username=""):
+        """ handles get request """
         cookie = self.request.cookies.get("username")
 
         if cookie:
@@ -214,20 +234,25 @@ class WelcomePage(Handler):
 
 
 class LoginPage(Handler):
+    """ Request Handling for Login page """
 
     def valid_login(self, username, password):
+        """ checks for a valid user and password """
         user = user_by_name(username)
 
         if user and valid_pw(username, password, user.pw_hash):
             return user
 
     def render_login(self, error=""):
+        """ renders login template """
         self.render('login.html', error=error)
 
     def get(self):
+        """ handles get request """
         self.render_login()
 
     def post(self):
+        """ handles post request """
         have_error = False
         username = self.request.get('username')
         password = self.request.get('password')
@@ -245,31 +270,34 @@ class LoginPage(Handler):
 
 
 class LogOut(Handler):
+    """ handles requests to logout """
 
     def get(self):
+        """ handles get request """
         self.logout()
         self.redirect('/signup')
 
 
 class UsersPage(Handler):
+    """ handles requests for users page """
     def get(self):
+        """ handles get request """
         users = db.GqlQuery("SELECT * from User")
         self.render('users.html', users=users)
 
 
-class LikeHandler(Handler):  # this needs to be a post!!
+class LikeHandler(Handler):
+    """ Handles requests for like page """
+
     def get(self, post_id):
-        self.write("Working on Likes")
-        p = post_by_id(post_id)
-        print(p)
-        # p.likes = p.likes + 1
-        print(p.likes)
+        """ handles get request """
+        # post = post_by_id(post_id)
 
     def post(self, post_id):
+        """ handles post request """
         p = post_by_id(post_id)
         p.likes = p.likes + 1
         p.put()
-        print(p.likes)
         self.render('post.html', article=p)
 
 #  SIGN UP PAGE FUNCTIONS
@@ -282,63 +310,65 @@ PASSWORD_RE = re.compile(r"^.{3,20}$")
 EMAIL_RE = re.compile(r"^[\S]+@[\S]+.[\S]+$")
 
 
-# validates users username against username regex
 def valid_username(username):
+    """ checks for valid username """
     return username and USER_RE.match(username)
 
 
-# validates users password against password regex
 def valid_password(password):
+    """ checks for valid password """
     return password and PASSWORD_RE.match(password)
 
 
-# validates users email address against email regex
 def valid_email(email):
+    """ checks for valid email """
     return email and EMAIL_RE.match(email)
 
 
 def escape_html(string):
+    """ escapes html """
     return cgi.escape(string, quote=True)
 
 
 # USER FUNCTIONS
 
-# gets user by name
 def user_by_name(username):
-    user = User.all().filter('name =', username).get()
+    """ retrieves User by name """
+    user = User.all().filter('name =', username).get()  # pylint: disable=no-member
     return user
 
 
-# makes a random 5 letter salt
 def make_salt():
+    """ makes a random 5 letter salt """
     return ''.join(random.choice(string.letters) for x in xrange(5))
 
 
-# creates a password hash and salt if not already generated
-def make_pw_hash(name, pw, salt=None):
+def make_pw_hash(name, password, salt=None):
+    """ creates a password hash and salt if not already generated """
     if not salt:
         salt = make_salt()
-    h = hashlib.sha256(name + pw + salt).hexdigest()
-    return '%s|%s' % (h, salt)
+    pw_hash = hashlib.sha256(name + password + salt).hexdigest()
+    return '%s|%s' % (pw_hash, salt)
 
 
-# tests if password is valid
-def valid_pw(name, pw, h):
-    salt = h.split('|')[1]
-    return h == make_pw_hash(name, pw, salt)
+def valid_pw(name, password, pw_hash):
+    """ tests if password is valid """
+    salt = pw_hash.split('|')[1]
+    return pw_hash == make_pw_hash(name, password, salt)
 
 
-# returns the hash value of a string
 def hash_str(string):
+    """ returns the hash value of a string """
     return hmac.new(SECRET, string).hexdigest()
 
 
-# returns a secure value for cookies
 def make_secure_val(val):
+    """ returns a secure value for cookies """
     return "%s|%s" % (val, hash_str(val))
 
 
 def check_secure_val(secure_val):
+    """ checks the secure value of the cookie"""
     val = secure_val.split("|")[0]
     if secure_val == make_secure_val(val):
         return val
@@ -346,9 +376,9 @@ def check_secure_val(secure_val):
 
 # POST FUNCTIONS
 def post_by_id(post_id):
-    post = Post.get_by_id(int(post_id))
+    """ retrieves Post by id """
+    post = Post.get_by_id(int(post_id))  # pylint: disable=no-member
     return post
-
 
 # Routing
 
@@ -361,4 +391,4 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ('/logout', LogOut),
                                ('/user', UsersPage),
                                (r'/(\d+)/like', LikeHandler)
-                               ], debug=True)
+                              ], debug=True)
