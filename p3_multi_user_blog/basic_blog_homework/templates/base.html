@@ -10,22 +10,29 @@
 </head>
 <body>
   <header class="header row">
-    <div class="header-left col-6">
-      <h1 class="main-title"><a href="/">MultiBlog</a></h1>
-    </div>
-    <div class="header-right col-6">
-      <nav>
-        <ul class="nav-bar">
-          <li class="nav-item"><a href="/signup">Sign Up</a></li>
-          <li class="nav-item"><a href="/login">Log In</a></li>
-          <li class="nav-item"><a href="/logout">Log Out</a></li>
-        </ul>
-      </nav>
-    </div>
+      <div class="col-2"></div>
+      <div class="col-8">
+        <h1 class="main-title"><a href="/">MultiBlog</a></h1>
+        <nav>
+          <ul class="nav-bar">
+            <li class="nav-item"><a href="/signup">Sign Up</a></li>
+            <li class="nav-item"><a href="/login">Log In</a></li>
+            <li class="nav-item"><a href="/logout">Log Out</a></li>
+          </ul>
+        </nav>
+        <hr class="header-hr">
+      </div>
+      <div class="col-2"></div>
+
   </header>
-  <div class="content">
+
+  <div class="content row">
+    <div class="col-2"></div>
+    <div class="col-8">
     {% block content %}
     {% endblock %}
+    </div>
+    <div class="col-2"></div>
   </div>
 </body>
 </html>

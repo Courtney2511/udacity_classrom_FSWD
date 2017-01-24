@@ -4,9 +4,7 @@ body {
   position: relative;
   font-family: Helvetica, Arial, sans-serif;
   font-size: 14px;
-  width: 800px;
   margin: 0 auto;
-  padding: 10px;
   color: #333;
   background-color: #e9e7e9;
 }
@@ -27,17 +25,23 @@ a:visited {
 /* --- Header --- */
 
 .header {
-  border-bottom: 1px solid grey;
   margin-bottom: 50px;
   background-color: white;
+  height: 100px;
+}
+
+nav {
+  display: inline-block;
+  float: right;
 }
 
 .main-title {
-  display: block;
+  display: inline-block;
   color: #222;
+  width: 50%;
   font-size: 25px;
   padding-top: 10px;
-  margin-bottom: 30px;
+  margin-bottom: 15px;
   text-decoration: none;
 }
 
@@ -45,17 +49,19 @@ a:visited {
   color: grey;
 }
 
-.nav-bar {
-  display: inline-block;
-  float: right;
-}
-
 .nav-item {
   float: right;
-  border-radius: 5px;
-  border: 1px solid black;
+  color: #f384d9;
   margin: 5px;
   padding: 5px;
+  padding-top: 10px;
+}
+
+.header-hr {
+  border: 0;
+  height: 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 /* --- Base Layout --- */
@@ -71,7 +77,6 @@ a:visited {
 
 .headline {
   position: relative;
-  border-bottom: 3px solid #666;
 }
 
 .body {
