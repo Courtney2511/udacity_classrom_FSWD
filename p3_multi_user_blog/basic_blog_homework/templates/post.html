@@ -10,6 +10,10 @@
     <div class="created-by">
         <p class="authour">{{article.user.name}}</p>
         <p class="date">{{article.created.strftime("%b %d, %Y")}}</p>
+        <form action="/{{ article.key().id()}}/like" method="post">
+          <button type="submit" method="post">Like this!</button>
+        </form>
+        <p class="likes">{{article.likes}}</p>
     </div>
 </div>
 <div class="comment-row row">
@@ -19,9 +23,9 @@
     </label>
     <br>
     <input type="submit">
+</form>
 </div>
 
-</form>
 {% for comment in article.post_comments%}
 <div class="comment-box">
     <div class="comment">

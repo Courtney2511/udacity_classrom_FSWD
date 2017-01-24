@@ -32,6 +32,7 @@ class Post(db.Model):
     post = db.TextProperty(required=True)
     created = db.DateProperty(auto_now_add=True)
     user = db.ReferenceProperty(User, collection_name='user_posts')
+    likes = db.IntegerProperty()
 
 
 # Comment Model
@@ -109,7 +110,7 @@ class NewPost(Handler):
 
         if title and post and username:
             # creates a Post entity and saves to db
-            p = Post(user=user, title=title, post=post)
+            p = Post(user=user, title=title, post=post, likes=0)
             p.put()
             post_id = p.key().id()
             # redirects to post page
@@ -255,6 +256,22 @@ class UsersPage(Handler):
         users = db.GqlQuery("SELECT * from User")
         self.render('users.html', users=users)
 
+
+class LikeHandler(Handler):  # this needs to be a post!!
+    def get(self, post_id):
+        self.write("Working on Likes")
+        p = post_by_id(post_id)
+        print(p)
+        # p.likes = p.likes + 1
+        print(p.likes)
+
+    def post(self, post_id):
+        p = post_by_id(post_id)
+        p.likes = p.likes + 1
+        p.put()
+        print(p.likes)
+        self.render('post.html', article=p)
+
 #  SIGN UP PAGE FUNCTIONS
 
 # regex constant for username validation
@@ -330,6 +347,7 @@ def check_secure_val(secure_val):
 # POST FUNCTIONS
 def post_by_id(post_id):
     post = Post.get_by_id(int(post_id))
+    return post
 
 
 # Routing
@@ -341,5 +359,6 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ('/welcome', WelcomePage),
                                ('/login', LoginPage),
                                ('/logout', LogOut),
-                               ('/user', UsersPage)
+                               ('/user', UsersPage),
+                               (r'/(\d+)/like', LikeHandler)
                                ], debug=True)
