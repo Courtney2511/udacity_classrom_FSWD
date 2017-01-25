@@ -1,3 +1,5 @@
+""" Multi User Blog application with commenting and 'like' functionality """
+
 import os
 import cgi
 import re
@@ -127,9 +129,9 @@ class NewPost(Handler):
 
         if title and post and username:
             # creates a Post entity and saves to db
-            p = Post(user=user, title=title, post=post, likes=0)
-            p.put()
-            post_id = p.key().id()
+            new_post = Post(user=user, title=title, post=post, likes=0)
+            new_post.put()
+            post_id = new_post.key().id()
             # redirects to post page
             self.redirect('/' + str(post_id))
         else:
@@ -159,9 +161,10 @@ class PostPage(Handler):
             if cookie:
                 username = check_secure_val(cookie)
                 user = user_by_name(username)
-                c = Comment(comment=comment, post=article, user=user)
-                c.put()
-                self.render('post.html', article=article)
+                new_comment = Comment(comment=comment, post=article, user=user)
+                new_comment.put()
+                # self.render('post.html', article=article)
+                self.redirect('/' + post_id)  # TODO most recent comment not displayed until refresh
 
 
 # Sign Up Page Handler
@@ -172,10 +175,10 @@ class SignUp(Handler):
         """ creates a User and saves to db """
         # hashes password
         pw_hash = make_pw_hash(username, password)
-        u = User(name=username, pw_hash=pw_hash, email=email)
-        u.put()
+        new_user = User(name=username, pw_hash=pw_hash, email=email)
+        new_user.put()
         # creates and sets name cookie
-        cookie_val = make_secure_val(u.name)
+        cookie_val = make_secure_val(new_user.name)
         self.set_secure_cookie('username', cookie_val)
 
     def get(self):
@@ -256,7 +259,6 @@ class LoginPage(Handler):
 
     def post(self):
         """ handles post request """
-        have_error = False
         username = self.request.get('username')
         password = self.request.get('password')
 
@@ -298,9 +300,9 @@ class LikeHandler(Handler):
 
     def post(self, post_id):
         """ handles post request """
-        p = post_by_id(post_id)
-        p.likes = p.likes + 1
-        p.put()
+        post = post_by_id(post_id)
+        post.likes = post.likes + 1
+        post.put()
         self.redirect('/' + post_id)
 #  SIGN UP PAGE FUNCTIONS
 
@@ -393,4 +395,4 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ('/logout', LogOut),
                                ('/user', UsersPage),
                                (r'/(\d+)/like', LikeHandler)
-                              ], debug=True)
+                               ], debug=True)
