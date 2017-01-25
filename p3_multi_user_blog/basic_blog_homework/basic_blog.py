@@ -73,14 +73,18 @@ class Handler(webapp2.RequestHandler):
 
     def is_logged_in(self):
         """ checks for a logged in user """
-        cookie = self.request.cookies.get("username")
-        username = check_secure_val(cookie)
-        user = user_by_name(username)
-        print(user)
+        user = self.logged_in_user()
         if user:
             return True
         else:
             return False
+
+    def logged_in_user(self):
+        """ returns the logged in user """
+        cookie = self.request.cookies.get("username")
+        username = check_secure_val(cookie)
+        user = user_by_name(username)
+        return user
 
 
 
@@ -147,8 +151,9 @@ class PostPage(Handler):
     def render_article(self, post_id):
         """ renders the article template """
         user = self.is_logged_in()
+        logged_in_user = self.logged_in_user()
         article = Post.get_by_id(int(post_id))   # pylint: disable=no-member
-        self.render('post.html', article=article, user=user)
+        self.render('post.html', article=article, user=user, logged_in_user=logged_in_user)
 
     def get(self, post_id):
         """ handles get request """
@@ -169,7 +174,29 @@ class PostPage(Handler):
                 self.redirect('/' + post_id)  # TODO most recent comment not displayed until refresh
 
 
-# Sign Up Page Handler
+class EditPost(Handler):
+
+    def get(self, post_id):
+        post = post_by_id(post_id)
+        user = self.is_logged_in()
+        logged_in_user = self.logged_in_user()
+        if logged_in_user.name == post.user.name:
+            self.render('editpost.html', post=post, user=user)
+        else:
+            self.write("you can't edit other peoples posts")
+
+    def post(self, post_id):
+        post = post_by_id(post_id)
+        title_new = self.request.get("subject")
+        post_new = self.request.get("content")
+        post.title = title_new
+        post.put()
+        post.post = post_new
+        post.put()
+        self.redirect('/' + post_id)
+
+
+
 class SignUp(Handler):
     """ request handling for signup page """
 
@@ -396,6 +423,7 @@ def post_by_id(post_id):
 
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/newpost', NewPost),
+                               (r'/(\d+)/edit', EditPost),
                                (r'/(\d+)', PostPage),
                                ('/signup', SignUp),
                                ('/welcome', WelcomePage),

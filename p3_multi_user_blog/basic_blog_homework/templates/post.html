@@ -19,6 +19,11 @@
         {% endif %}
         <p class="like-count">{{article.likes}} Likes</p>
     </div>
+    {% if article.user.name == logged_in_user.name: %}
+    <div class="edit">
+      <a href="/{{article.key().id()}}/edit">Edit</a>
+    </div>
+    {% endif %}
 </div>
 <div class="comment-row row">
   {% if user == True %}
