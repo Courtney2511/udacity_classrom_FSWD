@@ -69,11 +69,14 @@ class Handler(webapp2.RequestHandler):
         """ deletes user from username cookie"""
         self.response.headers.add_header('Set-Cookie', 'username=; Path=/')
 
+    # I dont think this works
     def is_logged_in(self):
         """ checks for a logged in user """
         cookie = self.request.cookies.get("username")
-        if cookie.name is not None:
-            return cookie.name
+        if cookie.name is not "":
+            return True
+        else:
+            return False
 
 
 class MainPage(Handler):
@@ -298,8 +301,7 @@ class LikeHandler(Handler):
         p = post_by_id(post_id)
         p.likes = p.likes + 1
         p.put()
-        self.render('post.html', article=p)
-
+        self.redirect('/' + post_id)
 #  SIGN UP PAGE FUNCTIONS
 
 # regex constant for username validation
