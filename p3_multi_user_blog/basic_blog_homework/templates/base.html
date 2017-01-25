@@ -15,9 +15,14 @@
         <h1 class="main-title"><a href="/">MultiBlog</a></h1>
         <nav>
           <ul class="nav-bar">
+            {% if user == False: %}
             <li class="nav-item"><a href="/signup">Sign Up</a></li>
             <li class="nav-item"><a href="/login">Log In</a></li>
+            {% endif %}
+            {% if user == True %}
             <li class="nav-item"><a href="/logout">Log Out</a></li>
+            <li class="nav-item"><a href="/newpost">Write Something!</a></li>
+            {% endif %}
           </ul>
         </nav>
         <hr class="header-hr">

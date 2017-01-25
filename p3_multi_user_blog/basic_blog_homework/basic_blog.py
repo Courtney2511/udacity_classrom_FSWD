@@ -71,14 +71,17 @@ class Handler(webapp2.RequestHandler):
         """ deletes user from username cookie"""
         self.response.headers.add_header('Set-Cookie', 'username=; Path=/')
 
-    # I dont think this works
     def is_logged_in(self):
         """ checks for a logged in user """
         cookie = self.request.cookies.get("username")
-        if cookie.name is not "":
+        username = check_secure_val(cookie)
+        user = user_by_name(username)
+        print(user)
+        if user:
             return True
         else:
             return False
+
 
 
 class MainPage(Handler):
@@ -87,12 +90,9 @@ class MainPage(Handler):
     def render_index(self):
         """ renders index template """
         posts = db.GqlQuery("SELECT * from Post ORDER BY created DESC")
-        cookie = self.request.cookies.get('username')
-        username = check_secure_val(cookie)
-        # TODO sort out the user to get edit and delete working
-        user = user_by_name(username)
-        print user
-        self.render("index.html", posts=posts)
+        # cookie = self.request.cookies.get('username')
+        user = self.is_logged_in()
+        self.render("index.html", posts=posts, user=user)
 
     def get(self):
         """ handles get requests """
@@ -104,7 +104,8 @@ class NewPost(Handler):
 
     def render_newpost(self, title="", post="", error="", username=""):
         """ renders the newpost template """
-        self.render("newpost.html", title=title, post=post, error=error)
+        user = self.is_logged_in()
+        self.render("newpost.html", title=title, post=post, error=error, user=user)
 
     def get(self, username=""):
         """ handles get requests """
@@ -145,8 +146,9 @@ class PostPage(Handler):
 
     def render_article(self, post_id):
         """ renders the article template """
+        user = self.is_logged_in()
         article = Post.get_by_id(int(post_id))   # pylint: disable=no-member
-        self.render('post.html', article=article)
+        self.render('post.html', article=article, user=user)
 
     def get(self, post_id):
         """ handles get request """
@@ -183,7 +185,9 @@ class SignUp(Handler):
 
     def get(self):
         """ handles get request """
-        self.render('signup.html')
+        user = self.is_logged_in()
+
+        self.render('signup.html', user=user)
 
     def post(self):
         """ handles post request """
@@ -228,15 +232,18 @@ class WelcomePage(Handler):
 
     def get(self, username=""):
         """ handles get request """
+
         cookie = self.request.cookies.get("username")
+        user = self.is_logged_in()
+
 
         if cookie:
             username = check_secure_val(cookie)
 
         if username:
-            self.render("welcome.html", username=username)
+            self.render("welcome.html", username=username, user=user)
         else:
-            self.redirect("/signup")
+            self.redirect("/signup", user=user)
 
 
 class LoginPage(Handler):
@@ -251,7 +258,8 @@ class LoginPage(Handler):
 
     def render_login(self, error=""):
         """ renders login template """
-        self.render('login.html', error=error)
+        user = self.is_logged_in()
+        self.render('login.html', error=error, user=user)
 
     def get(self):
         """ handles get request """
