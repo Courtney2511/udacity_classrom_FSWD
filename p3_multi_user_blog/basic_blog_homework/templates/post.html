@@ -6,14 +6,16 @@
     <div class="headline">
         <h3 class="post-title">{{ article.title }}</h3>
     </div>
-    <p class="body">{{ article.post }}</p>
+    <div class="body">
+      <p class="post-body">{{ article.post }}</p>
+    </div>
     <div class="created-by">
         <p class="authour">{{article.user.name}}</p>
         <p class="date">{{article.created.strftime("%b %d, %Y")}}</p>
-        <form action="/{{ article.key().id()}}/like" method="post">
-          <button type="submit" method="post">Like this!</button>
+        <form class="like-count" action="/{{ article.key().id()}}/like" method="post">
+          <button class="like-count" type="submit" method="post">Like this!</button>
         </form>
-        <p class="likes">{{article.likes}}</p>
+        <p class="like-count">{{article.likes}} Likes</p>
     </div>
 </div>
 <div class="comment-row row">
@@ -29,8 +31,9 @@
 {% for comment in article.post_comments%}
 <div class="comment-box">
     <div class="comment">
-        <p class="authour">{{comment.user.name}}</p>
-        <p class="date">{{comment.created.strftime("%b %d, %Y")}} by: </p>
+        <p class="authour-comment">{{comment.user.name}}</p>
+        <p class="date-comment">{{comment.created.strftime("%b %d, %Y")}}</p>
+        <br>
         <p class="body">{{comment.comment}}</p>
     </div>
 </div>

@@ -102,11 +102,22 @@ nav {
 .authour {
   color: #f384d9;
   margin-left: 10px;
+  float: left;
 }
 
 .date {
   color: #d4cdd2;
   margin-left: 10px;
+  float: left;
+}
+
+.comment-count {
+  float: right;
+}
+
+.like-count {
+  float: right;
+  margin-right: 10px;
 }
 
 /* --- Post Page --- */
@@ -132,4 +143,15 @@ nav {
 
 .comments {
   margin-left: 30px;
+}
+.authour-comment {
+  color: #f384d9;
+  margin-left: 10px;
+  float: left;
+}
+
+.date-comment {
+  color: #d4cdd2;
+  margin-left: 10px;
+  float: left;
 }
