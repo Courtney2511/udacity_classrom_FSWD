@@ -295,8 +295,8 @@ class UsersPage(Handler):
     """ handles requests for users page """
     def get(self):
         """ handles get request """
-        users = db.GqlQuery("SELECT * from User")
-        self.render('users.html', users=users)
+        user = self.is_logged_in()
+        self.render('users.html', user=user)
 
 
 class LikeHandler(Handler):

@@ -12,13 +12,16 @@
     <div class="created-by">
         <p class="authour">{{article.user.name}}</p>
         <p class="date">{{article.created.strftime("%b %d, %Y")}}</p>
+        {% if user == True %}
         <form class="like-count" action="/{{ article.key().id()}}/like" method="post">
           <button class="like-count" type="submit" method="post">Like this!</button>
         </form>
+        {% endif %}
         <p class="like-count">{{article.likes}} Likes</p>
     </div>
 </div>
 <div class="comment-row row">
+  {% if user == True %}
 <form method="post">
     <label>
       <textarea class="comment-form" name="comment" cols="80" rows="5" placeholder="Add your thoughts....."></textarea>
@@ -26,6 +29,7 @@
     <br>
     <input type="submit">
 </form>
+ {% endif %}
 </div>
 
 {% for comment in article.post_comments%}
