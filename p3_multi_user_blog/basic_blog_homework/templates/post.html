@@ -12,7 +12,7 @@
     <div class="created-by">
         <p class="authour">{{article.user.name}}</p>
         <p class="date">{{article.created.strftime("%b %d, %Y")}}</p>
-        {% if user == True %}
+        {% if user == True and article.user.name != logged_in_user.name %}
         <form class="like-count" action="/{{ article.key().id()}}/like" method="post">
           <button class="like-count" type="submit" method="post">Like this!</button>
         </form>
@@ -22,6 +22,11 @@
     {% if article.user.name == logged_in_user.name: %}
     <div class="edit">
       <a href="/{{article.key().id()}}/edit">Edit</a>
+    </div>
+    <div class="delete">
+      <form class="delete" action="/{{article.key().id()}}/delete" method="post">
+        <button class="delete" type="submit" method="post">Delete</button>
+      </form>
     </div>
     {% endif %}
 </div>

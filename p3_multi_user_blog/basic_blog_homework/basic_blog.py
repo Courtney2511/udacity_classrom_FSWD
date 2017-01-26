@@ -87,7 +87,6 @@ class Handler(webapp2.RequestHandler):
         return user
 
 
-
 class MainPage(Handler):
     """ Handles requests to MainPage """
 
@@ -109,7 +108,8 @@ class NewPost(Handler):
     def render_newpost(self, title="", post="", error="", username=""):
         """ renders the newpost template """
         user = self.is_logged_in()
-        self.render("newpost.html", title=title, post=post, error=error, user=user)
+        self.render("newpost.html", title=title, post=post, error=error,
+                    user=user)
 
     def get(self, username=""):
         """ handles get requests """
@@ -153,7 +153,8 @@ class PostPage(Handler):
         user = self.is_logged_in()
         logged_in_user = self.logged_in_user()
         article = Post.get_by_id(int(post_id))   # pylint: disable=no-member
-        self.render('post.html', article=article, user=user, logged_in_user=logged_in_user)
+        self.render('post.html', article=article, user=user,
+                    logged_in_user=logged_in_user)
 
     def get(self, post_id):
         """ handles get request """
@@ -170,8 +171,8 @@ class PostPage(Handler):
                 user = user_by_name(username)
                 new_comment = Comment(comment=comment, post=article, user=user)
                 new_comment.put()
-                # self.render('post.html', article=article)
-                self.redirect('/' + post_id)  # TODO most recent comment not displayed until refresh
+                # TODO most recent comment not displayed until refresh
+                self.redirect('/' + post_id)
 
 
 class EditPost(Handler):
@@ -196,6 +197,20 @@ class EditPost(Handler):
         self.redirect('/' + post_id)
 
 
+class DeletePost(Handler):
+
+    def get(self, post_id):
+        """ handles get request """
+        post = post_by_id(post_id)
+
+    def post(self, post_id):
+        post = post_by_id(post_id)
+        user = self.is_logged_in()
+        print post
+        logged_in_user = self.logged_in_user()
+        if logged_in_user.name == post.user.name:
+            post.delete()
+            self.redirect('/')
 
 class SignUp(Handler):
     """ request handling for signup page """
@@ -373,7 +388,8 @@ def escape_html(string):
 
 def user_by_name(username):
     """ retrieves User by name """
-    user = User.all().filter('name =', username).get()  # pylint: disable=no-member
+    # pylint: disable=no-member
+    user = User.all().filter('name =', username).get()
     return user
 
 
@@ -424,6 +440,7 @@ def post_by_id(post_id):
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/newpost', NewPost),
                                (r'/(\d+)/edit', EditPost),
+                               (r'/(\d+)/delete', DeletePost),
                                (r'/(\d+)', PostPage),
                                ('/signup', SignUp),
                                ('/welcome', WelcomePage),
