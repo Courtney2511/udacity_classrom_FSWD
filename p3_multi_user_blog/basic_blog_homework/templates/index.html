@@ -1,7 +1,7 @@
  {% extends "base.html" %}
 
  {% block content %}
-
+    <!-- Displays all posts -->
     {% for post in posts %}
     <div class="post-box">
         <div class="headline">
@@ -16,11 +16,6 @@
           <p class="comment-count">{{post.post_comments.count()}} Comments</p>
           <p class="like-count">{{post.likes}} likes</p>
         </div>
-        <!-- {% if post.user.name == username %} {# this is not working #} -->
-        <!-- <div class="edit">
-          <a href="#">Edit</a><a href="#">Delete</a>
-        </div>
-        {% endif %} -->
     </div>
     {% endfor %}
 {% endblock %}

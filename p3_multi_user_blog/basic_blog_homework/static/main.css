@@ -1,4 +1,13 @@
+/* --- Main Styles and Typography ---*/
 
+.palette {
+  #e9e7e9
+  #333
+  white
+  grey
+  #f384d9
+  #d4cdd2
+}
 
 body {
   position: relative;

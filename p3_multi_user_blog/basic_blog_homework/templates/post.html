@@ -1,47 +1,47 @@
-{% extends "base.html" %}
-
-{% block content %}
-
+{% extends "base.html" %} {% block content %}
+<!-- Post Section -->
 <div class="post-box">
     <div class="headline">
         <h3 class="post-title">{{ article.title }}</h3>
     </div>
     <div class="body">
-      <p class="post-body">{{ article.post }}</p>
+        <p class="post-body">{{ article.post }}</p>
     </div>
     <div class="created-by">
         <p class="authour">{{article.user.name}}</p>
         <p class="date">{{article.created.strftime("%b %d, %Y")}}</p>
-        {% if user == True and article.user.name != logged_in_user.name %}
+        <!-- Controls like permissions: only logged in users, not post author -->
+        {% if user == True and article.user.name != logged_in_user.name or liked_by_user%}
         <form class="like-count" action="/{{ article.key().id()}}/like" method="post">
-          <button class="like-count" type="submit" method="post">Like this!</button>
+            <button class="like-count" type="submit" method="post">Like this!</button>
         </form>
         {% endif %}
         <p class="like-count">{{article.likes}} Likes</p>
     </div>
+    <!-- Controls edit post permissions: post author only -->
     {% if article.user.name == logged_in_user.name: %}
-    <div class="edit">
-      <a href="/{{article.key().id()}}/edit">Edit</a>
-    </div>
-    <div class="delete">
-      <form class="delete" action="/{{article.key().id()}}/delete" method="post">
-        <button class="delete" type="submit" method="post">Delete</button>
-      </form>
+    <div class="user-only-actions">
+          <a class="edit" href="/{{article.key().id()}}/edit">Edit</a>
+          <form class="delete" action="/{{article.key().id()}}/delete" method="post">
+              <button class="delete" type="submit" method="post">Delete</button>
+          </form>
     </div>
     {% endif %}
 </div>
+<!-- Comment Section -->
 <div class="comment-row row">
-  {% if user == True %}
-<form method="post">
-    <label>
-      <textarea class="comment-form" name="comment" cols="80" rows="5" placeholder="Add your thoughts....."></textarea>
-    </label>
-    <br>
-    <input type="submit">
-</form>
- {% endif %}
+    <!-- Controls commenting permissions: logged in users only -->
+    {% if user == True %}
+    <form method="post">
+        <label>
+          <textarea class="comment-form" name="comment" cols="80" rows="5" placeholder="Add your thoughts....."></textarea>
+        </label>
+        <br>
+        <input type="submit">
+    </form>
+    {% endif %}
 </div>
-
+<!-- Displays all comments on post -->
 {% for comment in article.post_comments%}
 <div class="comment-box">
     <div class="comment">

@@ -44,6 +44,13 @@ class Comment(db.Model):
     user = db.ReferenceProperty(User, collection_name='user_comments')
     post = db.ReferenceProperty(Post, collection_name='post_comments')
 
+
+class Like(db.Model):
+    """ Like Model """
+    post_liked = db.StringProperty(required=True)
+    like_user = db.StringProperty(required=True)
+
+
 # ---- Handler Classes ---- #
 
 
@@ -148,13 +155,21 @@ class NewPost(Handler):
 class PostPage(Handler):
     """ handles requests to PostPage """
 
+    # working on filtering likes for post liked by user for like once control
     def render_article(self, post_id):
         """ renders the article template """
         user = self.is_logged_in()
         logged_in_user = self.logged_in_user()
         article = Post.get_by_id(int(post_id))   # pylint: disable=no-member
+        # likes_on_post = db.GqlQuery("SELECT * from Like WHERE post_liked=:1", post_id) # working, but trying filter on query first
+        likes_on_post = db.Query(Like).filter("post_liked =", post_id)
+        for like in likes_on_post:
+            if like.like_user == logged_in_user.name:
+                print "user liked this"
+                print like.like_user
+
         self.render('post.html', article=article, user=user,
-                    logged_in_user=logged_in_user)
+                    logged_in_user=logged_in_user, likes_on_post=likes_on_post)
 
     def get(self, post_id):
         """ handles get request """
@@ -182,7 +197,7 @@ class EditPost(Handler):
         user = self.is_logged_in()
         logged_in_user = self.logged_in_user()
         if logged_in_user.name == post.user.name:
-            self.render('editpost.html', post=post, user=user)
+            self.render('editpost.html', post=post, user=user, post_id=post_id)
         else:
             self.write("you can't edit other peoples posts")
 
@@ -201,7 +216,6 @@ class DeletePost(Handler):
 
     def get(self, post_id):
         """ handles get request """
-        post = post_by_id(post_id)
 
     def post(self, post_id):
         post = post_by_id(post_id)
@@ -348,11 +362,15 @@ class LikeHandler(Handler):
         """ handles get request """
         # post = post_by_id(post_id)
 
-    def post(self, post_id):
+    def post(self, post_id, username=""):
         """ handles post request """
+        cookie = self.request.cookies.get("username")
+        username = check_secure_val(cookie)
         post = post_by_id(post_id)
         post.likes = post.likes + 1
         post.put()
+        like = Like(post_liked=post_id, like_user=username)
+        like.put()
         self.redirect('/' + post_id)
 #  SIGN UP PAGE FUNCTIONS
 
