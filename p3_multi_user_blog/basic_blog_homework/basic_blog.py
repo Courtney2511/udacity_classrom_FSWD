@@ -1,3 +1,4 @@
+
 """ Multi User Blog application with commenting and 'like' functionality """
 
 import os
@@ -34,7 +35,6 @@ class Post(db.Model):
     post = db.TextProperty(required=True)
     created = db.DateProperty(auto_now_add=True)
     user = db.ReferenceProperty(User, collection_name='user_posts')
-    likes = db.IntegerProperty()
 
 
 class Comment(db.Model):
@@ -47,8 +47,8 @@ class Comment(db.Model):
 
 class Like(db.Model):
     """ Like Model """
-    post_liked = db.StringProperty(required=True)
-    like_user = db.StringProperty(required=True)
+    post = db.ReferenceProperty(Post, required=True, collection_name='likes')
+    user = db.ReferenceProperty(User, required=True, collection_name='likes')
 
 
 # ---- Handler Classes ---- #
@@ -81,10 +81,7 @@ class Handler(webapp2.RequestHandler):
     def is_logged_in(self):
         """ checks for a logged in user """
         user = self.logged_in_user()
-        if user:
-            return True
-        else:
-            return False
+        return bool(user)
 
     def logged_in_user(self):
         """ returns the logged in user """
@@ -99,7 +96,7 @@ class MainPage(Handler):
 
     def render_index(self):
         """ renders index template """
-        posts = db.GqlQuery("SELECT * from Post ORDER BY created DESC")
+        posts = Post.all().order("-created").run()
         # cookie = self.request.cookies.get('username')
         user = self.is_logged_in()
         self.render("index.html", posts=posts, user=user)
@@ -112,11 +109,9 @@ class MainPage(Handler):
 class NewPost(Handler):
     """ Handles NewPost requests """
 
-    def render_newpost(self, title="", post="", error="", username=""):
+    def render_newpost(self, title="", post="", error=""):
         """ renders the newpost template """
-        user = self.is_logged_in()
-        self.render("newpost.html", title=title, post=post, error=error,
-                    user=user)
+        self.render("newpost.html", title=title, post=post, error=error)
 
     def get(self, username=""):
         """ handles get requests """
@@ -128,7 +123,7 @@ class NewPost(Handler):
             self.redirect("/login")
 
         if username:
-            self.render_newpost(username=username)
+            self.render_newpost()
 
     def post(self, username=""):
         """ handles post requests from newpost form """
@@ -160,16 +155,16 @@ class PostPage(Handler):
         """ renders the article template """
         user = self.is_logged_in()
         logged_in_user = self.logged_in_user()
-        article = Post.get_by_id(int(post_id))   # pylint: disable=no-member
-        # likes_on_post = db.GqlQuery("SELECT * from Like WHERE post_liked=:1", post_id) # working, but trying filter on query first
-        likes_on_post = db.Query(Like).filter("post_liked =", post_id)
-        for like in likes_on_post:
-            if like.like_user == logged_in_user.name:
-                print "user liked this"
-                print like.like_user
+        article = Post.get_by_id(int(post_id),
+                                 read_policy=db.STRONG_CONSISTENCY,
+                                 deadline=5)  # pylint: disable=no-member
+        # returns returns True if the current user has liked the article
+        already_liked = (logged_in_user.likes.filter("post = ",
+                                                     article).count() > 0)
+        print "The user has liked this %s times" % already_liked
 
         self.render('post.html', article=article, user=user,
-                    logged_in_user=logged_in_user, likes_on_post=likes_on_post)
+                    logged_in_user=logged_in_user, already_liked=already_liked)
 
     def get(self, post_id):
         """ handles get request """
@@ -191,24 +186,26 @@ class PostPage(Handler):
 
 
 class EditPost(Handler):
+    """ Handles requests for the edit post page """
 
     def get(self, post_id):
+        """ defines get """
         post = post_by_id(post_id)
         user = self.is_logged_in()
         logged_in_user = self.logged_in_user()
-        if logged_in_user.name == post.user.name:
+        if logged_in_user.name == post.user.name:  # pylint: disable=no-member
             self.render('editpost.html', post=post, user=user, post_id=post_id)
         else:
             self.write("you can't edit other peoples posts")
 
     def post(self, post_id):
+        """ defines posts """
         post = post_by_id(post_id)
-        title_new = self.request.get("subject")
-        post_new = self.request.get("content")
-        post.title = title_new
-        post.put()
-        post.post = post_new
-        post.put()
+        subject = self.request.get("subject")
+        content = self.request.get("content")
+        post.title = subject
+        post.post = content
+        post.put()  # pylint: disable=no-member
         self.redirect('/' + post_id)
 
 
@@ -218,13 +215,13 @@ class DeletePost(Handler):
         """ handles get request """
 
     def post(self, post_id):
+        """ deletes post form db """
         post = post_by_id(post_id)
-        user = self.is_logged_in()
-        print post
         logged_in_user = self.logged_in_user()
-        if logged_in_user.name == post.user.name:
-            post.delete()
+        if logged_in_user.name == post.user.name:  # pylint: disable=no-member
+            post.delete()  # pylint: disable=no-member
             self.redirect('/')
+
 
 class SignUp(Handler):
     """ request handling for signup page """
@@ -280,7 +277,7 @@ class SignUp(Handler):
 
         else:
             self.register(username, password, email)
-            self.redirect('/welcome')  # TODO redirect and send user??????
+            self.redirect('/welcome')
 
 
 class WelcomePage(Handler):
@@ -292,14 +289,13 @@ class WelcomePage(Handler):
         cookie = self.request.cookies.get("username")
         user = self.is_logged_in()
 
-
         if cookie:
             username = check_secure_val(cookie)
 
         if username:
             self.render("welcome.html", username=username, user=user)
         else:
-            self.redirect("/signup", user=user)
+            self.redirect("/signup")
 
 
 class LoginPage(Handler):
@@ -362,14 +358,11 @@ class LikeHandler(Handler):
         """ handles get request """
         # post = post_by_id(post_id)
 
-    def post(self, post_id, username=""):
+    def post(self, post_id):
         """ handles post request """
-        cookie = self.request.cookies.get("username")
-        username = check_secure_val(cookie)
+        user = self.logged_in_user()
         post = post_by_id(post_id)
-        post.likes = post.likes + 1
-        post.put()
-        like = Like(post_liked=post_id, like_user=username)
+        like = Like(post=post, user=user)
         like.put()
         self.redirect('/' + post_id)
 #  SIGN UP PAGE FUNCTIONS
@@ -397,9 +390,9 @@ def valid_email(email):
     return email and EMAIL_RE.match(email)
 
 
-def escape_html(string):
+def escape_html(value):
     """ escapes html """
-    return cgi.escape(string, quote=True)
+    return cgi.escape(value, quote=True)
 
 
 # USER FUNCTIONS
@@ -430,9 +423,9 @@ def valid_pw(name, password, pw_hash):
     return pw_hash == make_pw_hash(name, password, salt)
 
 
-def hash_str(string):
+def hash_str(value):
     """ returns the hash value of a string """
-    return hmac.new(SECRET, string).hexdigest()
+    return hmac.new(SECRET, value).hexdigest()
 
 
 def make_secure_val(val):
@@ -450,8 +443,7 @@ def check_secure_val(secure_val):
 # POST FUNCTIONS
 def post_by_id(post_id):
     """ retrieves Post by id """
-    post = Post.get_by_id(int(post_id))  # pylint: disable=no-member
-    return post
+    return Post.get_by_id(int(post_id))
 
 # Routing
 
@@ -466,4 +458,4 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ('/logout', LogOut),
                                ('/user', UsersPage),
                                (r'/(\d+)/like', LikeHandler)
-                               ], debug=True)
+                              ], debug=True)

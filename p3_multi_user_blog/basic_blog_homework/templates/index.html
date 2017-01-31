@@ -14,7 +14,7 @@
           <p class="authour">{{post.user.name}}</p>
           <p class="date">{{post.created.strftime("%b %d, %Y")}}</p>
           <p class="comment-count">{{post.post_comments.count()}} Comments</p>
-          <p class="like-count">{{post.likes}} likes</p>
+          <p class="like-count">{{post.likes.count()}} likes</p>
         </div>
     </div>
     {% endfor %}

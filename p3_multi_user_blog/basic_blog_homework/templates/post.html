@@ -10,13 +10,22 @@
     <div class="created-by">
         <p class="authour">{{article.user.name}}</p>
         <p class="date">{{article.created.strftime("%b %d, %Y")}}</p>
-        <!-- Controls like permissions: only logged in users, not post author -->
-        {% if user == True and article.user.name != logged_in_user.name or liked_by_user%}
-        <form class="like-count" action="/{{ article.key().id()}}/like" method="post">
-            <button class="like-count" type="submit" method="post">Like this!</button>
-        </form>
-        {% endif %}
-        <p class="like-count">{{article.likes}} Likes</p>
+          <!-- Displays liking functions to logged in users only-->
+          {% if user == True %}
+            <!-- unlike functionality for liked posts -->
+            {% if already_liked == True %}
+              <form action="">
+                <button>Unlike</button>
+              </form>
+            {% endif %}
+            <!-- restricts liking to non-authour users who havent already liked -->
+            {% if article.user.name != logged_in_user.name and already_liked == False %}
+              <form class="like-count" action="/{{ article.key().id()}}/like" method="post">
+                <button class="like-count" type="submit" method="post">Like this!</button>
+              </form>
+            {% endif %}
+          {% endif %}
+        <p class="like-count">{{article.likes.count()}} Likes</p>
     </div>
     <!-- Controls edit post permissions: post author only -->
     {% if article.user.name == logged_in_user.name: %}
