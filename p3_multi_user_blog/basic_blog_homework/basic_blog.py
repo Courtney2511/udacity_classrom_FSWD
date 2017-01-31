@@ -1,54 +1,22 @@
 
 """ Multi User Blog application with commenting and 'like' functionality """
-
 import os
-import cgi
-import re
-import string
-import random
-import hmac
 import hashlib
+import hmac
+import random
+import re
+import cgi
+import string
+import models
 import webapp2
 import jinja2
 
-from google.appengine.ext import db
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), 'templates')
 JINJA_ENV = jinja2.Environment(loader=jinja2.FileSystemLoader(TEMPLATE_DIR),
                                autoescape=True)
 
 SECRET = "kickass"
-
-# ---- Entity Models ---- #
-
-
-class User(db.Model):
-    """ User Model """
-    name = db.StringProperty(required=True)
-    pw_hash = db.StringProperty(required=True)
-    email = db.StringProperty()
-
-
-class Post(db.Model):
-    """ Post Model """
-    title = db.StringProperty(required=True)
-    post = db.TextProperty(required=True)
-    created = db.DateProperty(auto_now_add=True)
-    user = db.ReferenceProperty(User, collection_name='user_posts')
-
-
-class Comment(db.Model):
-    """ Comment Model """
-    comment = db.TextProperty(required=True)
-    created = db.DateProperty(auto_now_add=True)
-    user = db.ReferenceProperty(User, collection_name='user_comments')
-    post = db.ReferenceProperty(Post, collection_name='post_comments')
-
-
-class Like(db.Model):
-    """ Like Model """
-    post = db.ReferenceProperty(Post, required=True, collection_name='likes')
-    user = db.ReferenceProperty(User, required=True, collection_name='likes')
 
 
 # ---- Handler Classes ---- #
@@ -96,7 +64,7 @@ class MainPage(Handler):
 
     def render_index(self):
         """ renders index template """
-        posts = Post.all().order("-created").run()
+        posts = models.Post.all().order("-created").run()
         # cookie = self.request.cookies.get('username')
         is_logged_in = self.is_logged_in()
         self.render("index.html", posts=posts, is_logged_in=is_logged_in)
@@ -136,7 +104,7 @@ class NewPost(Handler):
 
         if title and post and username:
             # creates a Post entity and saves to db
-            new_post = Post(user=user, title=title, post=post, likes=0)
+            new_post = models.Post(user=user, title=title, post=post, likes=0)
             new_post.put()
             post_id = new_post.key().id()
             # redirects to post page
@@ -154,9 +122,7 @@ class PostPage(Handler):
         """ renders the article template """
         is_logged_in = self.is_logged_in()
         logged_in_user = self.logged_in_user()
-        article = Post.get_by_id(int(post_id),
-                                 read_policy=db.STRONG_CONSISTENCY,
-                                 deadline=5)  # pylint: disable=no-member
+        article = models.Post.get_by_id(int(post_id))
         # returns returns True if the current user has liked the article
         already_liked = (logged_in_user.likes.filter("post = ",
                                                      article).count() > 0)
@@ -171,16 +137,16 @@ class PostPage(Handler):
 
     def post(self, post_id):
         """ handles post request from comment form """
-        article = Post.get_by_id(int(post_id))  # pylint: disable=no-member
+        article = models.Post.get_by_id(int(post_id))
         comment = self.request.get("comment")
         if comment:
             cookie = self.request.cookies.get("username")
             if cookie:
                 username = check_secure_val(cookie)
                 user = user_by_name(username)
-                new_comment = Comment(comment=comment, post=article, user=user)
+                new_comment = models.Comment(comment=comment, post=article,
+                                             user=user)
                 new_comment.put()
-                # TODO most recent comment not displayed until refresh
                 self.redirect('/' + post_id)
 
 
@@ -193,7 +159,8 @@ class EditPost(Handler):
         is_logged_in = self.is_logged_in()
         logged_in_user = self.logged_in_user()
         if logged_in_user.name == post.user.name:  # pylint: disable=no-member
-            self.render('editpost.html', post=post, is_logged_in=is_logged_in, post_id=post_id)
+            self.render('editpost.html', post=post, is_logged_in=is_logged_in,
+                        post_id=post_id)
         else:
             self.write("you can't edit other peoples posts")
 
@@ -209,7 +176,7 @@ class EditPost(Handler):
 
 
 class DeletePost(Handler):
-
+    """ Handle requests to delete likes """
     def get(self, post_id):
         """ handles get request """
 
@@ -229,7 +196,7 @@ class SignUp(Handler):
         """ creates a User and saves to db """
         # hashes password
         pw_hash = make_pw_hash(username, password)
-        new_user = User(name=username, pw_hash=pw_hash, email=email)
+        new_user = models.User(name=username, pw_hash=pw_hash, email=email)
         new_user.put()
         # creates and sets name cookie
         cookie_val = make_secure_val(new_user.name)
@@ -292,7 +259,8 @@ class WelcomePage(Handler):
             username = check_secure_val(cookie)
 
         if username:
-            self.render("welcome.html", username=username, is_logged_in=is_logged_in)
+            self.render("welcome.html", username=username,
+                        is_logged_in=is_logged_in)
         else:
             self.redirect("/signup")
 
@@ -361,9 +329,10 @@ class LikeHandler(Handler):
         """ handles post request """
         user = self.logged_in_user()
         post = post_by_id(post_id)
-        like = Like(post=post, user=user)
+        like = models.Like(post=post, user=user)
         like.put()
         self.redirect('/' + post_id)
+
 
 # working on unlike handler to delete likes on button click
 class UnlikeHandler(Handler):
@@ -374,10 +343,8 @@ class UnlikeHandler(Handler):
 
     def post(self, post_id):
         """ handles post request """
-        user = self.logged_in_user()
-        post = post_by_id(post_id)
-
-
+        # user = self.logged_in_user()
+        # post = post_by_id(post_id)
 
 
 #  SIGN UP PAGE FUNCTIONS
@@ -415,7 +382,7 @@ def escape_html(value):
 def user_by_name(username):
     """ retrieves User by name """
     # pylint: disable=no-member
-    user = User.all().filter('name =', username).get()
+    user = models.User.all().filter('name =', username).get()
     return user
 
 
@@ -458,7 +425,7 @@ def check_secure_val(secure_val):
 # POST FUNCTIONS
 def post_by_id(post_id):
     """ retrieves Post by id """
-    return Post.get_by_id(int(post_id))
+    return models.Post.get_by_id(int(post_id))
 
 # Routing
 
