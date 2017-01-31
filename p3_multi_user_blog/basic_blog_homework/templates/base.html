@@ -18,11 +18,11 @@
         <!-- Navigation -->
         <nav>
           <ul class="nav-bar">
-            {% if user == False: %}
+            {% if is_logged_in == False: %}
             <li class="nav-item"><a href="/signup">Sign Up</a></li>
             <li class="nav-item"><a href="/login">Log In</a></li>
             {% endif %}
-            {% if user == True %}
+            {% if is_logged_in == True %}
             <li class="nav-item"><a href="/logout">Log Out</a></li>
             <li class="nav-item"><a href="/newpost">Write Something!</a></li>
             {% endif %}

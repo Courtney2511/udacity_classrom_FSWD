@@ -98,8 +98,8 @@ class MainPage(Handler):
         """ renders index template """
         posts = Post.all().order("-created").run()
         # cookie = self.request.cookies.get('username')
-        user = self.is_logged_in()
-        self.render("index.html", posts=posts, user=user)
+        is_logged_in = self.is_logged_in()
+        self.render("index.html", posts=posts, is_logged_in=is_logged_in)
 
     def get(self):
         """ handles get requests """
@@ -152,7 +152,7 @@ class PostPage(Handler):
 
     def render_article(self, post_id):
         """ renders the article template """
-        user = self.is_logged_in()
+        is_logged_in = self.is_logged_in()
         logged_in_user = self.logged_in_user()
         article = Post.get_by_id(int(post_id),
                                  read_policy=db.STRONG_CONSISTENCY,
@@ -162,7 +162,7 @@ class PostPage(Handler):
                                                      article).count() > 0)
         print "The user has liked this %s times" % already_liked
 
-        self.render('post.html', article=article, user=user,
+        self.render('post.html', article=article, is_logged_in=is_logged_in,
                     logged_in_user=logged_in_user, already_liked=already_liked)
 
     def get(self, post_id):
@@ -190,10 +190,10 @@ class EditPost(Handler):
     def get(self, post_id):
         """ defines get """
         post = post_by_id(post_id)
-        user = self.is_logged_in()
+        is_logged_in = self.is_logged_in()
         logged_in_user = self.logged_in_user()
         if logged_in_user.name == post.user.name:  # pylint: disable=no-member
-            self.render('editpost.html', post=post, user=user, post_id=post_id)
+            self.render('editpost.html', post=post, is_logged_in=is_logged_in, post_id=post_id)
         else:
             self.write("you can't edit other peoples posts")
 
@@ -237,9 +237,9 @@ class SignUp(Handler):
 
     def get(self):
         """ handles get request """
-        user = self.is_logged_in()
+        is_logged_in = self.is_logged_in()
 
-        self.render('signup.html', user=user)
+        self.render('signup.html', is_logged_in=is_logged_in)
 
     def post(self):
         """ handles post request """
@@ -286,13 +286,13 @@ class WelcomePage(Handler):
         """ handles get request """
 
         cookie = self.request.cookies.get("username")
-        user = self.is_logged_in()
+        is_logged_in = self.is_logged_in()
 
         if cookie:
             username = check_secure_val(cookie)
 
         if username:
-            self.render("welcome.html", username=username, user=user)
+            self.render("welcome.html", username=username, is_logged_in=is_logged_in)
         else:
             self.redirect("/signup")
 
@@ -309,8 +309,8 @@ class LoginPage(Handler):
 
     def render_login(self, error=""):
         """ renders login template """
-        user = self.is_logged_in()
-        self.render('login.html', error=error, user=user)
+        is_logged_in = self.is_logged_in()
+        self.render('login.html', error=error, is_logged_in=is_logged_in)
 
     def get(self):
         """ handles get request """
@@ -346,8 +346,8 @@ class UsersPage(Handler):
     """ handles requests for users page """
     def get(self):
         """ handles get request """
-        user = self.is_logged_in()
-        self.render('users.html', user=user)
+        is_logged_in = self.is_logged_in()
+        self.render('users.html', is_logged_in=is_logged_in)
 
 
 class LikeHandler(Handler):
