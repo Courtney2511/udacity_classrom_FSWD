@@ -150,7 +150,6 @@ class NewPost(Handler):
 class PostPage(Handler):
     """ handles requests to PostPage """
 
-    # working on filtering likes for post liked by user for like once control
     def render_article(self, post_id):
         """ renders the article template """
         user = self.is_logged_in()
@@ -365,6 +364,22 @@ class LikeHandler(Handler):
         like = Like(post=post, user=user)
         like.put()
         self.redirect('/' + post_id)
+
+# working on unlike handler to delete likes on button click
+class UnlikeHandler(Handler):
+    """ Handles requests to unlike """
+
+    def get(self, post_id):
+        """ handles get request """
+
+    def post(self, post_id):
+        """ handles post request """
+        user = self.logged_in_user()
+        post = post_by_id(post_id)
+
+
+
+
 #  SIGN UP PAGE FUNCTIONS
 
 # regex constant for username validation
