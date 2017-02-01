@@ -11,6 +11,12 @@ class User(db.Model):
     pw_hash = db.StringProperty(required=True)
     email = db.StringProperty()
 
+    @classmethod
+    def user_by_name(cls, username):
+        """ retrieves User by name """
+        user = cls.all().filter('name =', username).get()
+        return user
+
 
 class Post(db.Model):
     """ Post Model """
@@ -18,6 +24,11 @@ class Post(db.Model):
     post = db.TextProperty(required=True)
     created = db.DateProperty(auto_now_add=True)
     user = db.ReferenceProperty(User, collection_name='user_posts')
+
+    @classmethod
+    def post_by_id(cls, post_id):
+        """ retrieves Post by id """
+        return cls.get_by_id(int(post_id))
 
 
 class Comment(db.Model):

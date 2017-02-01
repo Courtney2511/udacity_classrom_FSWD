@@ -7,9 +7,10 @@ import random
 import re
 import cgi
 import string
-import models
 import webapp2
 import jinja2
+
+from models import User, Post, Comment, Like
 
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), 'templates')
@@ -29,14 +30,15 @@ class Handler(webapp2.RequestHandler):
         """ writes response """
         self.response.out.write(*a, **kw)
 
-    def render_str(self, template, **params):
+    @staticmethod
+    def render_str(template, **params):
         """ renders jinja template string """
         jinja_template = JINJA_ENV.get_template(template)
         return jinja_template.render(params)
 
     def render(self, template, **kw):
         """ renders jinja template """
-        self.write(self.render_str(template, **kw))
+        self.write(Handler.render_str(template, **kw))
 
     def set_secure_cookie(self, cookie_name, cookie_val):
         """ sets secure cookie"""
@@ -55,7 +57,7 @@ class Handler(webapp2.RequestHandler):
         """ returns the logged in user """
         cookie = self.request.cookies.get("username")
         username = check_secure_val(cookie)
-        user = user_by_name(username)
+        user = User.user_by_name(username)
         return user
 
 
@@ -64,7 +66,7 @@ class MainPage(Handler):
 
     def render_index(self):
         """ renders index template """
-        posts = models.Post.all().order("-created").run()
+        posts = Post.all().order("-created").run()
         # cookie = self.request.cookies.get('username')
         is_logged_in = self.is_logged_in()
         self.render("index.html", posts=posts, is_logged_in=is_logged_in)
@@ -79,7 +81,9 @@ class NewPost(Handler):
 
     def render_newpost(self, title="", post="", error=""):
         """ renders the newpost template """
-        self.render("newpost.html", title=title, post=post, error=error)
+        is_logged_in = self.is_logged_in()
+        self.render("newpost.html", title=title, post=post, error=error,
+                    is_logged_in=is_logged_in)
 
     def get(self, username=""):
         """ handles get requests """
@@ -100,11 +104,11 @@ class NewPost(Handler):
         cookie = self.request.cookies.get("username")
 
         username = check_secure_val(cookie)
-        user = user_by_name(username)
+        user = User.user_by_name(username)
 
         if title and post and username:
             # creates a Post entity and saves to db
-            new_post = models.Post(user=user, title=title, post=post, likes=0)
+            new_post = Post(user=user, title=title, post=post, likes=0)
             new_post.put()
             post_id = new_post.key().id()
             # redirects to post page
@@ -122,7 +126,7 @@ class PostPage(Handler):
         """ renders the article template """
         is_logged_in = self.is_logged_in()
         logged_in_user = self.logged_in_user()
-        article = models.Post.get_by_id(int(post_id))
+        article = Post.get_by_id(int(post_id))
         # returns returns True if the current user has liked the article
         already_liked = (logged_in_user.likes.filter("post = ",
                                                      article).count() > 0)
@@ -137,15 +141,15 @@ class PostPage(Handler):
 
     def post(self, post_id):
         """ handles post request from comment form """
-        article = models.Post.get_by_id(int(post_id))
+        article = Post.get_by_id(int(post_id))
         comment = self.request.get("comment")
         if comment:
             cookie = self.request.cookies.get("username")
             if cookie:
                 username = check_secure_val(cookie)
-                user = user_by_name(username)
-                new_comment = models.Comment(comment=comment, post=article,
-                                             user=user)
+                user = User.user_by_name(username)
+                new_comment = Comment(comment=comment, post=article,
+                                      user=user)
                 new_comment.put()
                 self.redirect('/' + post_id)
 
@@ -155,7 +159,7 @@ class EditPost(Handler):
 
     def get(self, post_id):
         """ defines get """
-        post = post_by_id(post_id)
+        post = Post.post_by_id(post_id)
         is_logged_in = self.is_logged_in()
         logged_in_user = self.logged_in_user()
         if logged_in_user.name == post.user.name:  # pylint: disable=no-member
@@ -166,7 +170,7 @@ class EditPost(Handler):
 
     def post(self, post_id):
         """ defines posts """
-        post = post_by_id(post_id)
+        post = Post.post_by_id(post_id)
         subject = self.request.get("subject")
         content = self.request.get("content")
         post.title = subject
@@ -182,10 +186,10 @@ class DeletePost(Handler):
 
     def post(self, post_id):
         """ deletes post form db """
-        post = post_by_id(post_id)
+        post = Post.post_by_id(post_id)
         logged_in_user = self.logged_in_user()
-        if logged_in_user.name == post.user.name:  # pylint: disable=no-member
-            post.delete()  # pylint: disable=no-member
+        if logged_in_user.name == post.user.name:
+            post.delete()
             self.redirect('/')
 
 
@@ -196,7 +200,7 @@ class SignUp(Handler):
         """ creates a User and saves to db """
         # hashes password
         pw_hash = make_pw_hash(username, password)
-        new_user = models.User(name=username, pw_hash=pw_hash, email=email)
+        new_user = User(name=username, pw_hash=pw_hash, email=email)
         new_user.put()
         # creates and sets name cookie
         cookie_val = make_secure_val(new_user.name)
@@ -223,7 +227,7 @@ class SignUp(Handler):
             have_error = True
 
         # checks to make sure name is not taken
-        if user_by_name(username) is not None:
+        if User.user_by_name(username) is not None:
             params['error_username'] = "Username is already taken"
             have_error = True
 
@@ -268,13 +272,6 @@ class WelcomePage(Handler):
 class LoginPage(Handler):
     """ Request Handling for Login page """
 
-    def valid_login(self, username, password):
-        """ checks for a valid user and password """
-        user = user_by_name(username)
-
-        if user and valid_pw(username, password, user.pw_hash):
-            return user
-
     def render_login(self, error=""):
         """ renders login template """
         is_logged_in = self.is_logged_in()
@@ -289,7 +286,7 @@ class LoginPage(Handler):
         username = self.request.get('username')
         password = self.request.get('password')
 
-        user = self.valid_login(username, password)
+        user = valid_login(username, password)
 
         if user is None:
             error = "Invalid Login"
@@ -310,14 +307,6 @@ class LogOut(Handler):
         self.redirect('/signup')
 
 
-class UsersPage(Handler):
-    """ handles requests for users page """
-    def get(self):
-        """ handles get request """
-        is_logged_in = self.is_logged_in()
-        self.render('users.html', is_logged_in=is_logged_in)
-
-
 class LikeHandler(Handler):
     """ Handles requests for like page """
 
@@ -328,8 +317,8 @@ class LikeHandler(Handler):
     def post(self, post_id):
         """ handles post request """
         user = self.logged_in_user()
-        post = post_by_id(post_id)
-        like = models.Like(post=post, user=user)
+        post = Post.post_by_id(post_id)
+        like = Like(post=post, user=user)
         like.put()
         self.redirect('/' + post_id)
 
@@ -357,6 +346,14 @@ PASSWORD_RE = re.compile(r"^.{3,20}$")
 EMAIL_RE = re.compile(r"^[\S]+@[\S]+.[\S]+$")
 
 
+def valid_login(username, password):
+    """ checks for a valid user and password """
+    user = User.user_by_name(username)
+
+    if user and valid_pw(username, password, user.pw_hash):
+        return user
+
+
 def valid_username(username):
     """ checks for valid username """
     return username and USER_RE.match(username)
@@ -378,13 +375,6 @@ def escape_html(value):
 
 
 # USER FUNCTIONS
-
-def user_by_name(username):
-    """ retrieves User by name """
-    # pylint: disable=no-member
-    user = models.User.all().filter('name =', username).get()
-    return user
-
 
 def make_salt():
     """ makes a random 5 letter salt """
@@ -422,14 +412,9 @@ def check_secure_val(secure_val):
         return val
 
 
-# POST FUNCTIONS
-def post_by_id(post_id):
-    """ retrieves Post by id """
-    return models.Post.get_by_id(int(post_id))
-
 # Routing
 
-app = webapp2.WSGIApplication([('/', MainPage),
+app = webapp2.WSGIApplication([('/', MainPage), # pylint: disable=C0103
                                ('/newpost', NewPost),
                                (r'/(\d+)/edit', EditPost),
                                (r'/(\d+)/delete', DeletePost),
@@ -438,6 +423,5 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ('/welcome', WelcomePage),
                                ('/login', LoginPage),
                                ('/logout', LogOut),
-                               ('/user', UsersPage),
                                (r'/(\d+)/like', LikeHandler)
                               ], debug=True)

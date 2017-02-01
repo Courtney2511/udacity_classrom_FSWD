@@ -1,13 +1,13 @@
-/* --- Main Styles and Typography ---*/
+/* --- Main Styles and Typography --- */
 
-.palette {
+/* .palette {
   #e9e7e9
   #333
   white
   grey
   #f384d9
   #d4cdd2
-}
+} */
 
 body {
   position: relative;
@@ -153,6 +153,7 @@ nav {
 .comments {
   margin-left: 30px;
 }
+
 .authour-comment {
   color: #f384d9;
   margin-left: 10px;
