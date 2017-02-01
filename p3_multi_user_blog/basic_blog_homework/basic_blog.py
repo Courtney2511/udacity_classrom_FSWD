@@ -127,10 +127,11 @@ class PostPage(Handler):
         is_logged_in = self.is_logged_in()
         logged_in_user = self.logged_in_user()
         article = Post.get_by_id(int(post_id))
+        already_liked = False
         # returns returns True if the current user has liked the article
-        already_liked = (logged_in_user.likes.filter("post = ",
-                                                     article).count() > 0)
-        print "The user has liked this %s times" % already_liked
+        if logged_in_user:
+            already_liked = (logged_in_user.likes.filter("post = ",
+                                                         article).count() > 0)
 
         self.render('post.html', article=article, is_logged_in=is_logged_in,
                     logged_in_user=logged_in_user, already_liked=already_liked)
@@ -316,24 +317,32 @@ class LikeHandler(Handler):
 
     def post(self, post_id):
         """ handles post request """
+        action = self.request.get("like-button")
         user = self.logged_in_user()
         post = Post.post_by_id(post_id)
-        like = Like(post=post, user=user)
-        like.put()
+
+        if action == 'like':
+            like = Like(post=post, user=user)
+            like.put()
+        else:
+            like = user.likes.filter("post =", post).get()
+            like.delete()
         self.redirect('/' + post_id)
 
 
 # working on unlike handler to delete likes on button click
-class UnlikeHandler(Handler):
-    """ Handles requests to unlike """
-
-    def get(self, post_id):
-        """ handles get request """
-
-    def post(self, post_id):
-        """ handles post request """
-        # user = self.logged_in_user()
-        # post = post_by_id(post_id)
+# class UnlikeHandler(Handler):
+#     """ Handles requests to unlike """
+#
+#     def get(self, post_id):
+#         """ handles get request """
+#
+#     def post(self, post_id):
+#         """ handles post request """
+#         logged_in_user = self.logged_in_user()
+#         post = Post.post_by_id(post_id)
+#         liked_post = logged_in_user.likes.filter("post = ", post)
+#         print liked_post
 
 
 #  SIGN UP PAGE FUNCTIONS

@@ -10,18 +10,18 @@
     <div class="created-by">
         <p class="authour">{{article.user.name}}</p>
         <p class="date">{{article.created.strftime("%b %d, %Y")}}</p>
-          <!-- Displays liking functions to logged in users only-->
+          <!-- Displays 'like' functions to logged in users only-->
           {% if is_logged_in == True %}
             <!-- unlike functionality for liked posts -->
             {% if already_liked == True %}
-              <form class="like-count" action="">
-                <button>Unlike</button>
+              <form class="like-count" action="/{{ article.key().id()}}/like" method="post">
+                <button class="like-count" type="submit" value="unlike" name="like-button">Unlike</button>
               </form>
             {% endif %}
             <!-- restricts liking to non-authour users who havent already liked -->
             {% if article.user.name != logged_in_user.name and already_liked == False %}
               <form class="like-count" action="/{{ article.key().id()}}/like" method="post">
-                <button class="like-count" type="submit" method="post">Like this!</button>
+                <button class="like-count" type="submit" value="like" name="like-button" >Like this!</button>
               </form>
             {% endif %}
           {% endif %}
