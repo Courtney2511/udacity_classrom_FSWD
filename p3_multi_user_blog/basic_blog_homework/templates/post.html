@@ -21,11 +21,11 @@
             <!-- restricts liking to non-authour users who havent already liked -->
             {% if article.user.name != logged_in_user.name and already_liked == False %}
               <form class="like-count" action="/{{ article.key().id()}}/like" method="post">
-                <button class="like-count" type="submit" value="like" name="like-button" >Like this!</button>
+                <button class="like-count" type="submit" value="like" name="like-button" >Like</button>
               </form>
             {% endif %}
           {% endif %}
-        <p class="like-count">{{article.likes.count()}} Likes</p>
+        <p class="like-count"><i class="fa fa-heart-o" aria-hidden="true"></i> {{article.likes.count()}}</p>
     </div>
     <!-- Controls edit post permissions: post author only -->
     {% if article.user.name == logged_in_user.name: %}

@@ -1,21 +1,23 @@
 /* --- Main Styles and Typography --- */
 
 /* .palette {
-  #e9e7e9
+  #f7f4f4 <!-- background colour -->
+  #f3f1f1 <!-- outline colour -->
   #333
   white
   grey
-  #f384d9
+  #CA8BDB
   #d4cdd2
 } */
 
 body {
   position: relative;
-  font-family: Helvetica, Arial, sans-serif;
-  font-size: 14px;
+  font-family: 'Pontano Sans', Arial, sans-serif;
+  font-size: 18px;
+  line-height: 1.4em;
   margin: 0 auto;
   color: #333;
-  background-color: #e9e7e9;
+  background-color: #f7f4f4;
 }
 
 a {
@@ -37,6 +39,7 @@ a:visited {
   margin-bottom: 50px;
   background-color: white;
   height: 100px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 nav {
@@ -52,6 +55,7 @@ nav {
   padding-top: 10px;
   margin-bottom: 15px;
   text-decoration: none;
+  font-weight: bold;
 }
 
 .main-title.a:visited {
@@ -60,7 +64,8 @@ nav {
 
 .nav-item {
   float: right;
-  color: #f384d9;
+  color: #ca8bdb;
+  font-size: 14px;
   margin: 5px;
   padding: 5px;
   padding-top: 10px;
@@ -82,6 +87,7 @@ nav {
   margin: 15px;
   padding: 20px;
   border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .headline {
@@ -93,11 +99,16 @@ nav {
   margin-bottom: 10px;
 }
 
+.fa-heart-o {
+  color: red;
+}
+
 .error {
   color: red;
 }
 
 .created-by {
+  font-size: 14px;
   margin-bottom: 20px;
 }
 
@@ -106,10 +117,11 @@ nav {
 .post-title {
   font-size: 25px;
   text-decoration: none;
+  font-family: 'Francois One', Arial, sans-serif;
 }
 
 .authour {
-  color: #f384d9;
+  color: #CA8BDB;
   margin-left: 10px;
   float: left;
 }
@@ -155,7 +167,7 @@ nav {
 }
 
 .authour-comment {
-  color: #f384d9;
+  color: #CA8BDB;
   margin-left: 10px;
   float: left;
 }
