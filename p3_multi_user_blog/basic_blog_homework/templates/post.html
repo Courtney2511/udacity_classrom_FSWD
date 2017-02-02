@@ -58,6 +58,9 @@
         <p class="date-comment">{{comment.created.strftime("%b %d, %Y")}}</p>
         <br>
         <p class="body">{{comment.comment}}</p>
+        {% if comment.user.name == logged_in_user.name %}
+        <a href="/{{article.key().id()}}/comment/{{comment.key().id()}}">Edit</a>
+        {% endif %}
     </div>
 </div>
 {% endfor %}

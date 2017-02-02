@@ -38,6 +38,11 @@ class Comment(db.Model):
     user = db.ReferenceProperty(User, collection_name='user_comments')
     post = db.ReferenceProperty(Post, collection_name='post_comments')
 
+    @classmethod
+    def comment_by_id(cls, comment_id):
+        """ retrieves Comment by id """
+        return cls.get_by_id(int(comment_id))
+
 
 class Like(db.Model):
     """ Like Model """

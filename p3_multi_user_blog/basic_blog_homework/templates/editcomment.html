@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="comment-row row">
+    <!-- Controls commenting permissions: logged in users only -->
+    {% if is_logged_in == True %}
+    <form method="post">
+        <label>
+          <textarea class="comment-form" name="comment" cols="80" rows="5" placeholder="Add your thoughts.....">{{comment.comment}}</textarea>
+        </label>
+        <br>
+        <input type="submit">
+    </form>
+    {% endif %}
+</div>
+
+{% endblock %}

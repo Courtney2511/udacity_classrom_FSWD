@@ -179,6 +179,28 @@ class EditPost(Handler):
         post.put()  # pylint: disable=no-member
         self.redirect('/' + post_id)
 
+class EditComment(Handler):
+    """ Handles requests for the edit comment page """
+
+    def get(self, post_id, comment_id):
+        is_logged_in = self.is_logged_in()
+        logged_in_user = self.logged_in_user()
+        post = Post.post_by_id(post_id)
+        comment = Comment.comment_by_id(comment_id)
+        if logged_in_user.name == comment.user.name:
+            comment = Comment.comment_by_id(comment_id)
+            self.render('editcomment.html', is_logged_in=is_logged_in, comment=comment)
+        else:
+            self.write("You can only edit your own comments")
+
+    def post(self, post_id, comment_id):
+        """" defines post """
+        comment = Comment.comment_by_id(comment_id)
+        comment_edit = self.request.get("comment")
+        comment.comment = comment_edit
+        comment.put()
+        self.redirect('/' + post_id)
+
 
 class DeletePost(Handler):
     """ Handle requests to delete likes """
@@ -426,6 +448,7 @@ def check_secure_val(secure_val):
 app = webapp2.WSGIApplication([('/', MainPage), # pylint: disable=C0103
                                ('/newpost', NewPost),
                                (r'/(\d+)/edit', EditPost),
+                               (r'/(\d+)/comment/(\d+)', EditComment),
                                (r'/(\d+)/delete', DeletePost),
                                (r'/(\d+)', PostPage),
                                ('/signup', SignUp),
