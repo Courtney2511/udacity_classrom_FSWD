@@ -211,5 +211,24 @@ nav {
 }
 
 #new-post-submit:hover {
-  background-color: #B160C7;
+  background-color: #b160c7;
+}
+
+/* --- Edit Post --- */
+
+.edit-post {
+  margin-bottom: 20px;
+}
+
+#edit-post-submit {
+  background-color: #ca8bdb;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  padding: 8px;
+  margin-right: 15px;
+}
+
+#edit-post-submit:hover {
+  background-color: #b160c7;
 }
