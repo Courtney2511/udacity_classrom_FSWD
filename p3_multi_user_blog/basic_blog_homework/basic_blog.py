@@ -56,6 +56,8 @@ class Handler(webapp2.RequestHandler):
     def logged_in_user(self):
         """ returns the logged in user """
         cookie = self.request.cookies.get("username")
+        if not cookie:
+            return None
         username = check_secure_val(cookie)
         user = User.user_by_name(username)
         return user
@@ -182,10 +184,10 @@ class EditPost(Handler):
 class EditComment(Handler):
     """ Handles requests for the edit comment page """
 
-    def get(self, post_id, comment_id):
+    def get(self, comment_id):
+        """ defines get """
         is_logged_in = self.is_logged_in()
         logged_in_user = self.logged_in_user()
-        post = Post.post_by_id(post_id)
         comment = Comment.comment_by_id(comment_id)
         if logged_in_user.name == comment.user.name:
             comment = Comment.comment_by_id(comment_id)
@@ -286,8 +288,9 @@ class WelcomePage(Handler):
             username = check_secure_val(cookie)
 
         if username:
+            posts = Post.all().filter("name = ", username)
             self.render("welcome.html", username=username,
-                        is_logged_in=is_logged_in)
+                        is_logged_in=is_logged_in, posts=posts)
         else:
             self.redirect("/signup")
 
@@ -352,19 +355,6 @@ class LikeHandler(Handler):
         self.redirect('/' + post_id)
 
 
-# working on unlike handler to delete likes on button click
-# class UnlikeHandler(Handler):
-#     """ Handles requests to unlike """
-#
-#     def get(self, post_id):
-#         """ handles get request """
-#
-#     def post(self, post_id):
-#         """ handles post request """
-#         logged_in_user = self.logged_in_user()
-#         post = Post.post_by_id(post_id)
-#         liked_post = logged_in_user.likes.filter("post = ", post)
-#         print liked_post
 
 
 #  SIGN UP PAGE FUNCTIONS

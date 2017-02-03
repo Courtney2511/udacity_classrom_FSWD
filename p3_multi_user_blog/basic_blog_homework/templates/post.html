@@ -32,7 +32,7 @@
     <div class="user-only-actions">
           <a class="edit" href="/{{article.key().id()}}/edit">Edit</a>
           <form class="delete" action="/{{article.key().id()}}/delete" method="post">
-              <button class="delete" type="submit" method="post">Delete</button>
+              <button id="post-delete" type="submit" method="post">Delete</button>
           </form>
     </div>
     {% endif %}
@@ -45,8 +45,7 @@
         <label>
           <textarea class="comment-form" name="comment" cols="80" rows="5" placeholder="Add your thoughts....."></textarea>
         </label>
-        <br>
-        <input type="submit">
+        <input id="submit-comment" type="submit">
     </form>
     {% endif %}
 </div>
