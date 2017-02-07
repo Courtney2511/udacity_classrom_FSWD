@@ -2,12 +2,12 @@
 
 /* .palette {
   #f7f4f4 <!-- background colour -->
-  #f3f1f1 <!-- outline colour -->
-  #333
+  rgba(0, 0, 0, 0.1)        <!-- outline colour -->
+  #333   <!-- Base Font colour -->
   white
-  grey
-  #CA8BDB
-  #d4cdd2
+  #CA8BDB <!-- Links and User name -->
+  #b160c7 <!-- Links: Hover -->
+  #d4cdd2 <!-- Date and Comment placeholder -->
 } */
 
 body {
@@ -29,18 +29,25 @@ a:visited {
   color: inherit;
 }
 
+.error {
+  color: red;
+}
+
+/* -- Base Layout -- */
+
 .page-title {
   font-size: 20px;
   font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
 }
 
-.submit-button {
+.submit {
   background-color: #ca8bdb;
   font-size: 16px;
   border: none;
   border-radius: 5px;
   padding: 8px;
-  margin-right: 15px;
 }
 
 /* --- Header --- */
@@ -50,11 +57,6 @@ a:visited {
   background-color: white;
   height: 100px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-nav {
-  display: inline-block;
-  float: right;
 }
 
 .main-title {
@@ -68,8 +70,9 @@ nav {
   font-weight: bold;
 }
 
-.main-title.a:visited {
-  color: grey;
+nav {
+  display: inline-block;
+  float: right;
 }
 
 .nav-item {
@@ -88,8 +91,6 @@ nav {
   border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-/* --- Base Layout --- */
-
 /* --- Index Page --- */
 
 .post-box {
@@ -104,6 +105,12 @@ nav {
   position: relative;
 }
 
+.post-title {
+  font-size: 25px;
+  text-decoration: none;
+  font-family: 'Francois One', Arial, sans-serif;
+}
+
 .body {
   margin-top: 10px;
   margin-bottom: 10px;
@@ -113,21 +120,9 @@ nav {
   color: red;
 }
 
-.error {
-  color: red;
-}
-
 .created-by {
   font-size: 14px;
   margin-bottom: 20px;
-}
-
-/* --- Post Index --- */
-
-.post-title {
-  font-size: 25px;
-  text-decoration: none;
-  font-family: 'Francois One', Arial, sans-serif;
 }
 
 .authour {
@@ -154,16 +149,6 @@ nav {
   font-family: 'Pontano Sans', Arial, sans-serif;
   font-size: 14px;
   cursor: pointer;
-}
-
-.user-only-actions {
-  padding: 15px;
-  text-align: center;
-}
-
-.delete {
-  display: inline-block;
-  font-size: 18px;
 }
 
 /* --- Post Page --- */
@@ -200,6 +185,24 @@ nav {
   float: left;
 }
 
+.user-only-actions {
+  padding: 15px;
+  text-align: center;
+}
+
+#post-delete {
+  border: none;
+  background-color: white;
+  font-family: 'Pontano Sans', Arial, sans-serif;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.delete {
+  display: inline-block;
+  font-size: 18px;
+}
+
 .date-comment {
   color: #d4cdd2;
   margin-left: 10px;
@@ -215,23 +218,10 @@ nav {
   margin-bottom: 10px;
 }
 
-#post-delete {
-  border: none;
-  background-color: white;
-  font-family: 'Pontano Sans', Arial, sans-serif;
-  font-size: 18px;
-  cursor: pointer;
-}
-
 /* --- New Post --- */
 
 .new-post {
   margin-bottom: 20px;
-}
-
-.page-title {
-  margin-bottom: 10px;
-  text-align: center;
 }
 
 #post-title {

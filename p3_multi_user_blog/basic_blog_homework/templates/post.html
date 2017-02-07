@@ -1,4 +1,5 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %}
+{% block content %}
 <!-- Post Section -->
 <div class="post-box">
     <div class="headline">
@@ -10,30 +11,29 @@
     <div class="created-by">
         <p class="authour">{{article.user.name}}</p>
         <p class="date">{{article.created.strftime("%b %d, %Y")}}</p>
-          <!-- Displays 'like' functions to logged in users only-->
-          {% if is_logged_in == True %}
-            <!-- unlike functionality for liked posts -->
-            {% if already_liked == True %}
-              <form class="like-count" action="/{{ article.key().id()}}/like" method="post">
-                <button class="like-count" type="submit" value="unlike" name="like-button">Unlike</button>
-              </form>
-            {% endif %}
-            <!-- restricts liking to non-authour users who havent already liked -->
-            {% if article.user.name != logged_in_user.name and already_liked == False %}
-              <form class="like-count" action="/{{ article.key().id()}}/like" method="post">
-                <button class="like-count" type="submit" value="like" name="like-button" >Like</button>
-              </form>
-            {% endif %}
-          {% endif %}
+        <!-- Displays 'like' functions to logged in users only-->
+        {% if is_logged_in == True %}
+        <!-- unlike functionality for liked posts -->
+        {% if already_liked == True %}
+        <form class="like-count" action="/{{ article.key().id()}}/like" method="post">
+            <button class="like-count" type="submit" value="unlike" name="like-button">Unlike</button>
+        </form>
+        {% endif %}
+        <!-- restricts liking to non-authour users who havent already liked -->
+        {% if article.user.name != logged_in_user.name and already_liked == False %}
+        <form class="like-count" action="/{{ article.key().id()}}/like" method="post">
+            <button class="like-count" type="submit" value="like" name="like-button">Like</button>
+        </form>
+        {% endif %} {% endif %}
         <p class="like-count"><i class="fa fa-heart-o" aria-hidden="true"></i> {{article.likes.count()}}</p>
     </div>
     <!-- Controls edit post permissions: post author only -->
     {% if article.user.name == logged_in_user.name: %}
     <div class="user-only-actions">
-          <a class="edit" href="/{{article.key().id()}}/edit">Edit</a>
-          <form class="delete" action="/{{article.key().id()}}/delete" method="post">
-              <button id="post-delete" type="submit" method="post">Delete</button>
-          </form>
+        <a class="edit" href="/{{article.key().id()}}/edit">Edit</a>
+        <form class="delete" action="/{{article.key().id()}}/delete" method="post">
+            <button id="post-delete" type="submit" method="post">Delete</button>
+        </form>
     </div>
     {% endif %}
 </div>
@@ -58,8 +58,7 @@
         <br>
         <p class="body">{{comment.comment}}</p>
         {% if comment.user.name == logged_in_user.name %}
-        <a href="/{{article.key().id()}}/comment/{{comment.key().id()}}">Edit</a>
-        {% endif %}
+        <a href="/{{article.key().id()}}/comment/{{comment.key().id()}}">Edit</a> {% endif %}
     </div>
 </div>
 {% endfor %}

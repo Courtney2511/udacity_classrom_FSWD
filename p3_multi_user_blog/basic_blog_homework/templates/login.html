@@ -1,27 +1,26 @@
 {% extends 'base.html' %}
-
 {% block content %}
 
 <h2 class="page-title">Log In</h2>
 <br>
 <form method="post">
-  <table>
-    <tbody>
-      <tr>
-        <td class="label">Username</td>
-        <td><input type="text" name="username" value="{{username}}"></td>
-      </tr>
-      <tr>
-        <td class="label">Password</td>
-        <td><input type="text" name="password" value="{{password}}"></td>
-      </tr>
-      <tr>
-        <td class="error">{{error}}</td>
-      </tr>
-    </tbody>
-  </table>
-  <br>
-  <input class="submit-button" type="submit" value="Log In">
+    <table>
+        <tbody>
+            <tr>
+                <td class="label">Username</td>
+                <td><input type="text" name="username" value="{{username}}"></td>
+            </tr>
+            <tr>
+                <td class="label">Password</td>
+                <td><input type="text" name="password" value="{{password}}"></td>
+            </tr>
+            <tr>
+                <td class="error">{{error}}</td>
+            </tr>
+        </tbody>
+    </table>
+    <br>
+    <input class="submit-button" type="submit" value="Log In">
 </form>
 
 {% endblock %}

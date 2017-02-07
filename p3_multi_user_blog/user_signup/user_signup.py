@@ -134,11 +134,10 @@ class MainPage(Handler):
             self.redirect("/welcome?username=" + username)
 
 
-
 class WelcomePage(Handler):
     def get(self):
         username = self.request.get('username')
-        self.write(welcome_page % {"username": username})  # TODO sort username variable
+        self.write(welcome_page % {"username": username})
 
 
 app = webapp2.WSGIApplication([

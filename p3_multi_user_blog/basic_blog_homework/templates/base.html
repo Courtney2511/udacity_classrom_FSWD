@@ -1,51 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <title>MultiBlog</title>
-  <link type="text/css" rel="stylesheet" href="/static/framework.css">
-  <link type="text/css" rel="stylesheet" href="/static/normalize.css">
-  <link type="text/css" rel="stylesheet" href="/static/main.css">
-  <link href="https://fonts.googleapis.com/css?family=Francois+One|Pontano+Sans" rel="stylesheet">
-  <script src="https://use.fontawesome.com/07b81fe90a.js"></script>
+    <meta charset="UTF-8">
+    <title>MultiBlog</title>
+    <link type="text/css" rel="stylesheet" href="/static/framework.css">
+    <link type="text/css" rel="stylesheet" href="/static/normalize.css">
+    <link type="text/css" rel="stylesheet" href="/static/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Francois+One|Pontano+Sans" rel="stylesheet">
+    <script src="https://use.fontawesome.com/07b81fe90a.js"></script>
 </head>
 
 <body>
-  <!-- Header -->
-  <header class="header row">
-      <div class="col-2"></div>
-      <div class="col-8">
-        <!-- Title -->
-        <h1 class="main-title"><a href="/"><i class="fa fa-users" aria-hidden="true"></i>  MultiBlog</a></h1>
-        <!-- Navigation -->
-        <nav>
-          <ul class="nav-bar">
-            {% if is_logged_in == False: %}
-            <li class="nav-item"><a href="/signup">Sign Up</a></li>
-            <li class="nav-item"><a href="/login">Log In</a></li>
-            {% endif %}
-            {% if is_logged_in == True %}
-            <li class="nav-item"><a href="/logout">Log Out</a></li>
-            <li class="nav-item"><a href="/newpost">Write Something!</a></li>
-            {% endif %}
-          </ul>
-        </nav>
-        <hr class="header-hr">
-      </div>
-      <div class="col-2"></div>
-  </header>
+    <!-- Header -->
+    <header class="header row">
+        <div class="col-2"></div>
+        <div class="col-8">
+            <!-- Title -->
+            <h1 class="main-title"><a href="/"><i class="fa fa-users" aria-hidden="true"></i>  MultiBlog</a></h1>
+            <!-- Navigation -->
+            <nav>
+                <ul class="nav-bar">
+                    {% if is_logged_in == False: %}
+                    <li class="nav-item"><a href="/signup">Sign Up</a></li>
+                    <li class="nav-item"><a href="/login">Log In</a></li>
+                    {% endif %} {% if is_logged_in == True %}
+                    <li class="nav-item"><a href="/logout">Log Out</a></li>
+                    <li class="nav-item"><a href="/newpost">Write Something!</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            <hr class="header-hr">
+        </div>
+        <div class="col-2"></div>
+    </header>
 
-  <!-- Main Content -->
-  <div class="content row">
-    <!-- Left Side -->
-    <div class="col-2"></div>
-    <!--Centre -->
-    <div class="col-8">
-    {% block content %}
-    {% endblock %}
+    <!-- Main Content -->
+    <div class="content row">
+        <!-- Left Side -->
+        <div class="col-2"></div>
+        <!--Centre -->
+        <div class="col-8">
+            {% block content %}
+            {% endblock %}
+        </div>
+        <!-- Right Side -->
+        <div class="col-2"></div>
     </div>
-    <!-- Right Side -->
-    <div class="col-2"></div>
-  </div>
 </body>
+
 </html>

@@ -1,22 +1,21 @@
 {% extends "base.html" %}
-
 {% block content %}
 <!-- New Post Page -->
 <div class="new-post">
-  <h2 class="page-title">New Post</h2>
+    <h2 class="page-title">New Post</h2>
 
-  <form method="post">
-    <label>
+    <form method="post">
+        <label>
       <h3>Title</h3>
       <input id="post-title" type="text" name="subject" value="{{title}}" size="80">
     </label>
-    <label>
+        <label>
       <h3>Post</h3>
       <textarea id="post-content" name="content" rows="30" cols="78">{{post}}</textarea>
     </label>
-      <br>
-      <input id="new-post-submit" type="submit" value="Publish">
-      <div class="error">{{error}}</div>
-  </form>
+        <br>
+        <input id="new-post-submit" type="submit" value="Publish">
+        <div class="error">{{error}}</div>
+    </form>
 </div>
 {% endblock %}

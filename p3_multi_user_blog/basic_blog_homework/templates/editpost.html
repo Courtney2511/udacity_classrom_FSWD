@@ -1,23 +1,21 @@
-{% extends 'base.html' %}
-
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 <!-- Edit post page -->
 <div class="edit-post">
-  <h2 class="page-title">Edit Post</h2>
+    <h2 class="page-title">Edit Post</h2>
 
-  <form method="post">
-    <label>
+    <form method="post">
+        <label>
       <div>Title</div>
       <input id="post-title" type="text" name="subject" value="{{post.title}}" size="80">
     </label>
-    <label>
+        <label>
       <div>Post</div>
       <textarea id="post-content" name="content" rows="35" cols="78">{{post.post}}</textarea>
     </label>
-      <br>
-      <input id="edit-post-submit" type="submit" value="Save Changes">
-      <a href="/{{post_id}}">Cancel Edit</a>
-      <div class="error">{{error}}</div>
-  </form>
+        <br>
+        <input id="edit-post-submit" type="submit" value="Save Changes">
+        <a href="/{{post_id}}">Cancel Edit</a>
+        <div class="error">{{error}}</div>
+    </form>
 </div>
 {% endblock %}
