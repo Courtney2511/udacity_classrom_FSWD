@@ -25,23 +25,26 @@ Multi User Blog is a basic blogging engine for multiple users.
 
 # How to run the application:
 
+Visit the application at: https://multi-user-blog-157519.appspot.com/
+
+To run locally:
+
 Ensure Python 2.7 is installed
-'''
+
+```
 $ python -V
-'''
+```
 
 Install Google Cloud SDK
 
 https://cloud.google.com/appengine/docs/python/download
 
 Clone the repo in your terminal
-'''
+```
 $ git clone git@github.com:Courtney2511/basic_blog_homework.git
-'''
+```
 
 Navigate to the folder where the files were installed and run:
-'''
+```
 $ dev_appserver.py .
-'''
-
-to run the application locally.
+```
