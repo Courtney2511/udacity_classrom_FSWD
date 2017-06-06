@@ -1,0 +1,38 @@
+.title {
+  font-family: 'Gloria Hallelujah', cursive;
+  text-align: center;
+}
+
+#cat-list {
+  font-family: 'PT Mono', monospace;
+  list-style: none;
+  cursor: pointer;
+  text-align: center;
+}
+
+li {
+  display: inline;
+  margin: 20px;
+}
+
+.cat-container {
+  display: inline-block;
+  text-align: center;
+  width: 100%;
+  margin: 0 auto;
+}
+
+#cat {
+  font-family: 'Gloria Hallelujah', cursive;
+  margin-bottom: 10px;
+}
+
+p {
+  font-family: 'PT Mono', monospace;
+  display: inline;
+}
+
+.cat-img {
+  width: 200px;
+  height: 150px;
+}
