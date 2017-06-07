@@ -40,7 +40,6 @@ var octopus = {
   // initializes the current cat and the list
   init: function() {
     model.currentCat = model.cats[0];
-    console.log(model.currentCat);
     catListView.init();
     catView.init();
   },
@@ -78,7 +77,6 @@ var catView = {
 
     this.catImgElem.addEventListener('click', function(){
       octopus.incrementCounter();
-      console.log(model.currentCat.clicks)
     });
     this.render()
   },
@@ -98,15 +96,11 @@ var catListView = {
   },
 
   render: function() {
-    console.log("made it here")
     var cats = octopus.getCats()
-    console.log(cats)
     for (i=0; i < cats.length; i++) {
       cat = cats[i];
-      console.log(cat)
       listItem = document.createElement('li');
       listItem.textContent = cat.name;
-      console.log(listItem)
       listItem.addEventListener('click', (function(catCopy){
         return function() {
           octopus.setCurrentCat(catCopy);
@@ -121,28 +115,3 @@ var catListView = {
 
 // initializes the page
 octopus.init();
-
-// // iterate through cat array
-// for (i=0; i < cats.length; i++) {
-//   var cat = cats[i]
-//   // append cat to cat list
-//   var listItem = '<li id="cat' + i + '">' + cat.name + '</li>'
-//   $('#cat-list').append(listItem)
-//   // add event listener to display cat picture on click
-//   $('#cat' + i).on('click', (function(catCopy) {
-//     return function() {
-//       $('#cat-img').attr('src', catCopy.photo);
-//     };
-//   })(cat));
-//
-//
-//   $('#cat-button').on('click', (function(catsCopy){
-//     return function() {
-//       var cat = catsCopy[i]
-//       console.log(cat)
-//       cat.clicks += 1;
-//       $('#clicks-counter').text(cat.clicks);
-//     };
-//   })(cats));
-//
-// }
