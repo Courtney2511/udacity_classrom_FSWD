@@ -48,3 +48,5 @@ Navigate to the folder where the files were installed and run:
 ```
 $ dev_appserver.py .
 ```
+
+Visit the application at localhost:8080
